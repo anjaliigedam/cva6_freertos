@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "freertos.h": "c",
+        "freertosconfig.h": "c",
+        "syscalls.h": "c",
+        "clib.h": "c"
+    }
+}

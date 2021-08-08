@@ -124,7 +124,6 @@ equivalent in ticks using the portTICK_PERIOD_MS constant. */
 
 //#define mainDELAY_LOOP_COUNT                (1000UL) //test_2
 
-#define UART_PRINTF 1
 /*-----------------------------------------------------------*/
 
 

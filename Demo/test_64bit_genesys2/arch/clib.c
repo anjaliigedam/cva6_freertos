@@ -81,7 +81,6 @@
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
 
-#define UART_PRINTF 1
 extern uart_instance_t * const gp_my_uart = &g_uart_0;
 
 
