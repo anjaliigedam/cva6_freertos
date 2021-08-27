@@ -82,7 +82,7 @@ APP_SRC =  \
 	$(APP_SOURCE_DIR)/TimerDemo.c \
 	$(APP_SOURCE_DIR)/EventGroupsDemo.c \
 	$(APP_SOURCE_DIR)/TaskNotify.c \
-	$(APP_SOURCE_DIR)/GenQTest.c 
+	$(APP_SOURCE_DIR)/GenQTest.c
 	
 	
 		
@@ -98,10 +98,10 @@ DEMO_SRC = \
 	main_blinky.c \
 	main_full.c \
 	my_tests.c \
-	../Common/Minimal/dynamic.c \
+	../Common/Full/dynamic.c \
 	../Common/Full/semtest.c \
-	../Common/Full/print.c \
-	RegTest.S
+	../Common/Full/print.c\
+	./asm/RegTest.S
 	
 # ../Common/Minimal/StreamBufferDemo.c
 # ../Common/Minimal/StreamBufferInterrupt.c
@@ -119,7 +119,7 @@ INCLUDES = \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISCV \
 	-I/home/thales/riscv/riscv64-unknown-elf/include/riscv-pk  \
 	-I./uart \
-	-I./Source/include
+	-I./Source/include 
 
 CFLAGS = \
 	$(WARNINGS) $(INCLUDES) \
@@ -164,10 +164,13 @@ $(PROG).elf  : $(OBJS) Makefile
 	@echo Completed $@
 
 clean :
-	@rm -f $(OBJS)
+	@cp asm/RegTest.S RegTest.S 
+	@rm -f $(OBJS).o
 	@rm -f $(PROG).elf 
 	@rm -f $(PROG).map
 	@rm -f $(PROG).asm
+	@mv RegTest.S asm/RegTest.S 
+
 
 force_true:
 	@true
