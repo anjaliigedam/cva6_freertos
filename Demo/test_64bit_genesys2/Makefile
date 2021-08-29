@@ -97,6 +97,7 @@ DEMO_SRC = \
 	main.c \
 	main_blinky.c \
 	main_full.c \
+	main_full2.c \
 	my_tests.c \
 	../Common/Full/dynamic.c \
 	../Common/Full/semtest.c \

@@ -184,6 +184,7 @@ void led_off(){
 
 void main_blinky( void );
 void main_full( void );
+void main_full2( void );
 
 void test_SingleTask_LEDBlink_LoopDelay( void );
 void test_2Task_LED_blink_vdelay( void );
@@ -192,7 +193,23 @@ void test_2( void );
 void test_3( void );
 void test_4( void );
 
-
+int dummy(){
+    int i;
+    for(i = 0; i < 100; i++)
+    {
+        i++;
+    }
+    return i;
+}
+void uart1_rx_handler(uart_instance_t * this_uart)
+{
+    uint32_t rx_size; 
+      uint8_t rx_buff[32];
+      uint32_t rx_idx  = 0;
+      rx_size = UART_get_rx(this_uart, rx_buff, sizeof(rx_buff));
+      
+    printf("uart1_rx_handler interrupt called\r\n");
+}
 
 int main( void )
 {
@@ -210,11 +227,41 @@ int main( void )
     UART_polled_tx(gp_my_uart, "HELLO CVA6\r\n ", 13);
 
     
+    uint8_t rx_buff[32];
+    uint32_t rx_idx  = 0;
+    uint32_t rx_size  = 0;
+
+    UART_set_rx_handler(gp_my_uart,
+                              uart1_rx_handler,
+                              UART_FIFO_SINGLE_BYTE);
+
+    /*
+    // pollig testcase
+    while(1)
+    { int i =0;
+        i = dummy();
+        
+        i = dummy();
+        
+          //printf("check for rx\r\n");
+          rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+          if(rx_size > 0)
+          {
+              printf("Rx DONE size = %d\r\n", rx_size);
+              printf("%c\r\n",rx_buff[0]);
+          }
+          
+    }
+    */
+
+      
+
     /* main_blinky */
-    //main_blinky();
+    // main_blinky();
     
     /* main_full */
-    main_full();
+    //main_full();
+    main_full2();
 
     /* my_tests */
     //test_SingleTask_LEDBlink_LoopDelay();

@@ -147,10 +147,10 @@ static TaskHandle_t xHighPriorityMutexTask, xMediumPriorityMutexTask;
 
 void vStartGenericQueueTasks( UBaseType_t uxPriority )
 {
-QueueHandle_t xQueue;
-SemaphoreHandle_t xMutex;
+	QueueHandle_t xQueue;
+	SemaphoreHandle_t xMutex;
 
-
+	
 	/* Create the queue that we are going to use for the
 	prvSendFrontAndBackTest demo. */
 	xQueue = xQueueCreate( genqQUEUE_LENGTH, sizeof( uint32_t ) );

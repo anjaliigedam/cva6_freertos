@@ -312,7 +312,7 @@ typedef void (*uart_irq_handler_t)( uart_instance_t * this_uart );
 #define CLEAR_TX_FIFO               2u                  /* Clear transmitter FIFO */
 #define DMA_MODE                    3u                  /* DMA mode */
 #define FIFO64_ENABLE               5u                  /* FIFO64 enable */
-//#define RDYMODE                     3u                  /* Mode 0 or Mode 1 for TXRDY and RXRDY */
+#define RDYMODE                     3u                  /* Mode 0 or Mode 1 for TXRDY and RXRDY */
 #define FIFO_RX_TRIGGER             6u                  /* FIFO RX trigger */
 
 /* FIFO Control register bit MASKS */
@@ -321,7 +321,7 @@ typedef void (*uart_irq_handler_t)( uart_instance_t * this_uart );
 #define CLEAR_TX_FIFO_MASK             (0x01u << 2u)      /* Clear transmitter FIFO */
 #define DMA_MODE_MASK                  (0x01u << 3u)      /* DMA mode */
 #define FIFO64_ENABLE_MASK             (0x01u << 5u)      /* FIFO64 enable */
-//#define RDYMODE_MASK                 (0x01u << 3u)      /* Mode 0 or Mode 1 for TXRDY and RXRDY */
+#define RDYMODE_MASK                 (0x01u << 3u)      /* Mode 0 or Mode 1 for TXRDY and RXRDY */
 
 #define FIFO_RX_TRIGGER_LEVEL_4_MASK   (0x01u << 6u)
 #define FIFO_RX_TRIGGER_LEVEL_8_MASK   (0x02u << 6u)

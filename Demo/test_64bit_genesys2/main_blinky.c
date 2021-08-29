@@ -72,6 +72,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "uart/uart.h"
 
 /* Priorities used by the tasks. */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
@@ -99,7 +100,7 @@ find the queue full. */
  * main.c.
  */
 void main_blinky( void );
-
+extern uart_instance_t * const gp_my_uart;
 /*
  * The tasks as described in the comments at the top of this file.
  */
@@ -193,6 +194,10 @@ extern void vToggleLED( void );
 	printf( "Calling %s\n", __func__ );
 	/* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
+	uint8_t rx_buff[32];
+    uint32_t rx_idx = 0;
+    uint32_t rx_size = 0;
+
 
 	for( ;; )
 	{
@@ -203,10 +208,10 @@ extern void vToggleLED( void );
 
 		/*  To get here something must have been received from the queue, but
 		is it the expected value?  If it is, toggle the LED. */
-		printf("Received value = %d Expected value = %d \r\n", ulReceivedValue, ulExpectedValue);
+		//printf("Received value = %d Expected value = %d \r\n", ulReceivedValue, ulExpectedValue);
 		if( ulReceivedValue == ulExpectedValue )
 		{
-			vSendString( pcPassMessage );
+			//vSendString( pcPassMessage );
 			vToggleLED();
 			ulReceivedValue = 0U;
 		}
@@ -214,6 +219,15 @@ extern void vToggleLED( void );
 		{
 			vSendString( pcFailMessage );
 		}
+		
+		// Polling testcase 
+    	rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+        //printf("UART get rx");
+		if(rx_size > 0)
+        {
+          printf("UART data received size = %d", rx_size);
+        }
+	  
 	}
 }
 /*-----------------------------------------------------------*/

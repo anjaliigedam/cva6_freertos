@@ -94,7 +94,7 @@ extern uint32_t SystemCoreClock;
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 50000000 ) // 50MHz
 //#define configTICK_CLOCK_HZ			( ( unsigned long ) 1000000 )
 #define configTICK_CLOCK_HZ			( ( unsigned long ) 50000000 ) // 50MHz
-#define configTICK_RATE_HZ			( ( TickType_t ) 1000 )//original
+#define configTICK_RATE_HZ			( ( TickType_t ) 100 )//original
 //#define configTICK_RATE_HZ			( ( TickType_t ) 10000 )//genesys2
 //#define configTICK_RATE_HZ			( ( TickType_t ) 100000 )//test 2
 //#define configTICK_RATE_HZ			( ( TickType_t ) 10000 ) //test-2 verilator

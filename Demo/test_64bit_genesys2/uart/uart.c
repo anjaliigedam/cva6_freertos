@@ -75,12 +75,12 @@ static void global_init
     this_uart->hw_reg->FCR = FIFO_RX_TRIGGER_LEVEL_14_MASK | CLEAR_RX_FIFO_MASK | CLEAR_TX_FIFO_MASK | RXRDY_TXRDYN_EN_MASK;
 
     /* clear transmitter FIFO */
-    //this_uart->hw_reg->FCR |= CLEAR_TX_FIFO_MASK;
+    this_uart->hw_reg->FCR |= CLEAR_TX_FIFO_MASK;
 
     /* set default READY mode : Mode 0*/
     /* enable RXRDYN and TXRDYN pins. The earlier FCR write to set the TX FIFO
      * trigger level inadvertently disabled the FCR_RXRDY_TXRDYN_EN bit. */
-   // this_uart->hw_reg->FCR |= RXRDY_TXRDYN_EN_MASK;
+    this_uart->hw_reg->FCR |= RXRDY_TXRDYN_EN_MASK;
 
     this_uart->hw_reg->MCR = 0u;
 
@@ -323,12 +323,13 @@ UART_get_rx
 
     //ASSERT(rx_buff != ((uint8_t*)0));
     //ASSERT(buff_size > 0u);
+    //printf("UART_get_rx() called buff_size = %d\n", buff_size);
 
     if ((rx_buff != (uint8_t*)0) && (buff_size > 0u))
     {
         status = this_uart->hw_reg->LSR;
         this_uart->status |= status;
-
+        //printf("status = %d\n", status);
         while (((status & UART_DATA_READY) != 0u) && (rx_size < buff_size))
         {
             rx_buff[rx_size] = this_uart->hw_reg->RBR;
