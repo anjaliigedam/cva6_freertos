@@ -1542,7 +1542,7 @@ void vTaskStartScheduler( void )
 {
 	BaseType_t xReturn;
 
-	printf("\r\n DEBUG 1 \r\n");
+	//printf("\r\n DEBUG 1 \r\n");
 	/* Add the idle task at the lowest priority. */
 	#if ( INCLUDE_xTaskGetIdleTaskHandle == 1 )
 	{
@@ -1557,16 +1557,16 @@ void vTaskStartScheduler( void )
 	}
 	#endif /* INCLUDE_xTaskGetIdleTaskHandle */
 
-	printf("\r\n DEBUG 2 \r\n");
+	//printf("\r\n DEBUG 2 \r\n");
 	#if ( configUSE_TIMERS == 1 )
 	{
 		if( xReturn == pdPASS )
 		{
-			printf("\r\n DEBUG 2.1 \r\n");
-			printf("\r\n DEBUG 2.1 \r\n");
+			//printf("\r\n DEBUG 2.1 \r\n");
+			//printf("\r\n DEBUG 2.1 \r\n");
 
 			xReturn = xTimerCreateTimerTask();
-			printf("\r\n DEBUG 2.2 return = %d\r\n", xReturn);
+			//printf("\r\n DEBUG 2.2 return = %d\r\n", xReturn);
 
 		}
 		else
@@ -1584,7 +1584,7 @@ void vTaskStartScheduler( void )
 		so interrupts will automatically get re-enabled when the first task
 		starts to run. */
 		portDISABLE_INTERRUPTS();
-		printf("\r\n DEBUG 3 \r\n");
+		//printf("\r\n DEBUG 3 \r\n");
 		#if ( configUSE_NEWLIB_REENTRANT == 1 )
 		{
 			/* Switch Newlib's _impure_ptr variable to point to the _reent
@@ -1601,19 +1601,19 @@ void vTaskStartScheduler( void )
 		macro must be defined to configure the timer/counter used to generate
 		the run time counter time base. */
 		portCONFIGURE_TIMER_FOR_RUN_TIME_STATS();
-		printf("\r\n DEBUG 4 \r\n");
+		//printf("\r\n DEBUG 4 \r\n");
 		/* Setting up the timer tick is hardware specific and thus in the
 		portable interface. */
 		if( xPortStartScheduler() != pdFALSE )
 		{
 			/* Should not reach here as if the scheduler is running the
 			function will not return. */
-			printf("\r\n DEBUG 5 \r\n");
+			//printf("\r\n DEBUG 5 \r\n");
 		}
 		else
 		{
 			/* Should only reach here if a task calls xTaskEndScheduler(). */
-			printf("\r\n DEBUG 6 \r\n");
+			//printf("\r\n DEBUG 6 \r\n");
 		}
 	}
 	else
@@ -1621,7 +1621,7 @@ void vTaskStartScheduler( void )
 		/* This line will only be reached if the kernel could not be started,
 		because there was not enough FreeRTOS heap to create the idle task
 		or the timer task. */
-		printf("\r\n DEBUG 7 \r\n");
+		//printf("\r\n DEBUG 7 \r\n");
 		configASSERT( xReturn );
 	}
 }

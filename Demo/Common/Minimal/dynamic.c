@@ -187,6 +187,7 @@ static uint32_t ulExpectedValue = ( uint32_t ) 0;
  */
 void vStartDynamicPriorityTasks( void )
 {
+	print("vStartDynamicPriorityTasks\n");
 	xSuspendedTestQueue = xQueueCreate( priSUSPENDED_QUEUE_LENGTH, sizeof( uint32_t ) );
 
 	/* vQueueAddToRegistry() adds the queue to the queue registry, if one is
@@ -197,15 +198,15 @@ void vStartDynamicPriorityTasks( void )
 	defined to be less than 1. */
 	vQueueAddToRegistry( xSuspendedTestQueue, "Suspended_Test_Queue" );
 
-	//printf("In vContinuousIncrementTask()\r\n");
+	printf("In vContinuousIncrementTask()\r\n");
 	xTaskCreate( vContinuousIncrementTask, "CNT_INC", priSTACK_SIZE, ( void * ) &ulCounter, tskIDLE_PRIORITY, &xContinuousIncrementHandle );
-	//printf("In vLimitedIncrementTask()\r\n");
+	printf("In vLimitedIncrementTask()\r\n");
 	xTaskCreate( vLimitedIncrementTask, "LIM_INC", priSTACK_SIZE, ( void * ) &ulCounter, tskIDLE_PRIORITY + 1, &xLimitedIncrementHandle );
-	//printf("In vCounterControlTask()\r\n");
+	printf("In vCounterControlTask()\r\n");
 	xTaskCreate( vCounterControlTask, "C_CTRL", priSTACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
-	//printf("In vQueueSendWhenSuspendedTask()\r\n");
+	printf("In vQueueSendWhenSuspendedTask()\r\n");
 	xTaskCreate( vQueueSendWhenSuspendedTask, "SUSP_TX", priSTACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
-	//printf("In vQueueReceiveWhenSuspendedTask()\r\n");
+	printf("In vQueueReceiveWhenSuspendedTask()\r\n");
 	xTaskCreate( vQueueReceiveWhenSuspendedTask, "SUSP_RX", priSTACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
 }
 /*-----------------------------------------------------------*/

@@ -160,18 +160,21 @@ static TickType_t xBasePeriod = 0;
 
 void vStartTimerDemoTask( TickType_t xBasePeriodIn )
 {
+	printf("\nvStartTimerDemoTask 1\n");
 	/* Start with the timer and counter arrays clear - this is only necessary
 	where the compiler does not clear them automatically on start up. */
 	memset( ucAutoReloadTimerCounters, 0x00, sizeof( ucAutoReloadTimerCounters ) );
 	memset( xAutoReloadTimers, 0x00, sizeof( xAutoReloadTimers ) );
 
+	printf("\nvStartTimerDemoTask 2\n");
 	/* Store the period from which all the timer periods will be generated from
 	(multiples of). */
 	xBasePeriod = xBasePeriodIn;
-
+	printf("\nvStartTimerDemoTask 3\n");
 	/* Create a set of timers for use by this demo/test. */
 	prvTest1_CreateTimersWithoutSchedulerRunning();
 
+	printf("\nvStartTimerDemoTask 4\n");
 	/* Create the task that will control and monitor the timers.  This is
 	created at a lower priority than the timer service task to ensure, as
 	far as it is concerned, commands on timers are actioned immediately
@@ -179,8 +182,10 @@ void vStartTimerDemoTask( TickType_t xBasePeriodIn )
 	task, which will then preempt this task). */
 	if( xTestStatus != pdFAIL )
 	{
+		printf("\nvStartTimerDemoTask 5\n");
 		xTaskCreate( prvTimerTestTask, "Tmr Tst", configMINIMAL_STACK_SIZE, NULL, configTIMER_TASK_PRIORITY - 1, NULL );
 	}
+	printf("\nvStartTimerDemoTask 6\n");
 }
 /*-----------------------------------------------------------*/
 
@@ -282,6 +287,8 @@ static TickType_t xIterationsWithoutCounterIncrement = ( TickType_t ) 0, xLastCy
 static void prvTest1_CreateTimersWithoutSchedulerRunning( void )
 {
 TickType_t xTimer;
+
+	printf("\nprvTest1_CreateTimersWithoutSchedulerRunning\n");
 
 	for( xTimer = 0; xTimer < configTIMER_QUEUE_LENGTH; xTimer++ )
 	{
@@ -730,6 +737,8 @@ void vTimerPeriodicISRTests( void )
 {
 static TickType_t uxTick = ( TickType_t ) -1;
 
+printf("\nvTimerPeriodicISRTests\n");
+
 #if( configTIMER_TASK_PRIORITY != ( configMAX_PRIORITIES - 1 ) )
 	/* The timer service task is not the highest priority task, so it cannot
 	be assumed that timings will be exact.  Timers should never call their
@@ -1046,6 +1055,8 @@ static void prvAutoReloadTimerCallback( TimerHandle_t pxExpiredTimer )
 {
 uint32_t ulTimerID;
 
+	printf("\nprvAutoReloadTimerCallback\n");
+
 	ulTimerID = ( uint32_t ) pvTimerGetTimerID( pxExpiredTimer );
 	if( ulTimerID <= ( configTIMER_QUEUE_LENGTH + 1 ) )
 	{
@@ -1055,6 +1066,7 @@ uint32_t ulTimerID;
 	{
 		/* The timer ID appears to be unexpected (invalid). */
 		xTestStatus = pdFAIL;
+		printf("TimerDemo.c - timer ID appears to be unexpected\n");
 		configASSERT( xTestStatus );
 	}
 }
@@ -1085,21 +1097,25 @@ uint32_t ulLastCallCount;
 
 static void prvISRAutoReloadTimerCallback( TimerHandle_t pxExpiredTimer )
 {
+	printf("\nprvISRAutoReloadTimerCallback\n");
 	/* The parameter is not used in this case as only one timer uses this
 	callback function. */
 	( void ) pxExpiredTimer;
 
 	ucISRAutoReloadTimerCounter++;
+	printf("ucISRAutoReloadTimerCallback = %d\n",ucISRAutoReloadTimerCounter);
 }
 /*-----------------------------------------------------------*/
 
 static void prvISROneShotTimerCallback( TimerHandle_t pxExpiredTimer )
 {
+	printf("\nprvISROneShotTimerCallback\n");
 	/* The parameter is not used in this case as only one timer uses this
 	callback function. */
 	( void ) pxExpiredTimer;
 
 	ucISROneShotTimerCounter++;
+	printf("ucISROneShotTimerCounter = %d\n",ucISROneShotTimerCounter);
 }
 /*-----------------------------------------------------------*/
 

@@ -388,6 +388,7 @@ UART_set_rx_handler
     if ((handler != INVALID_IRQ_HANDLER) &&
        (trigger_level < UART_FIFO_INVALID_TRIG_LEVEL))
     {
+        printf("UART DEBUG1\n");
         this_uart->rx_handler = handler;
 
         /* Set the receive interrupt trigger level. */
@@ -397,7 +398,7 @@ UART_set_rx_handler
 
         /* Enable receive interrupt. */
         this_uart->hw_reg->IER |= ERBFI_MASK;
-
+        printf("UART Enable IRQ\n");
         enable_irq(this_uart);
     }
 }
@@ -675,6 +676,7 @@ uart_isr
     uart_instance_t * this_uart
 )
 {
+    printf("uart_isr called\n");
     uint8_t iirf;
 
     iirf = this_uart->hw_reg->IIR & IIRF_MASK;
@@ -801,7 +803,9 @@ enable_irq
 
     if (&g_uart_0 == this_uart )
     {
+        printf("UART assign plic_num\n");
         plic_num = UART_0_PLIC_IRQHandler;
+
     }
     else
     {

@@ -178,10 +178,12 @@ UBaseType_t ux;
 
 	for( ;; )
 	{
+		printf("\n Controlling task \n");
 		/* Should not be able to 'give' the mutex, as we have not yet 'taken'
 		it.   The first time through, the mutex will not have been used yet,
 		subsequent times through, at this point the mutex will be held by the
 		polling task. */
+	
 		if( xSemaphoreGiveRecursive( xMutex ) == pdPASS )
 		{
 			xErrorOccurred = pdTRUE;
@@ -259,6 +261,7 @@ static void prvRecursiveMutexBlockingTask( void *pvParameters )
 
 	for( ;; )
 	{
+		printf("\n Blocking task \n");
 		/* This task will run while the controlling task is blocked, and the
 		controlling task will block only once it has the mutex - therefore
 		this call should block until the controlling task has given up the
@@ -315,6 +318,7 @@ static void prvRecursiveMutexPollingTask( void *pvParameters )
 
 	for( ;; )
 	{
+		//printf("\n Polling task \n");
 		/* Keep attempting to obtain the mutex.  We should only obtain it when
 		the blocking task has suspended itself, which in turn should only
 		happen when the controlling task is also suspended. */

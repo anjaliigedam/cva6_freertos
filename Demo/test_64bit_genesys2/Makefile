@@ -96,6 +96,10 @@ DEMO_SRC = \
 	uart/uart.c \
 	main.c \
 	main_blinky.c \
+	main_interrupt_demo.c \
+	main_polling_demo.c \
+	main_mutex_demo.c \
+	semaphore_demo.c \
 	main_full.c \
 	main_full2.c \
 	my_tests.c \

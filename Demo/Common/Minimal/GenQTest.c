@@ -79,6 +79,7 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
 
 /* Scheduler include files. */
 #include "FreeRTOS.h"
@@ -153,7 +154,9 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
 	
 	/* Create the queue that we are going to use for the
 	prvSendFrontAndBackTest demo. */
+	printf("\nQueue creation\n");
 	xQueue = xQueueCreate( genqQUEUE_LENGTH, sizeof( uint32_t ) );
+	printf("\nQueue created\n");
 
 	/* vQueueAddToRegistry() adds the queue to the queue registry, if one is
 	in use.  The queue registry is provided as a means for kernel aware
@@ -161,15 +164,21 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
 	is not being used.  The call to vQueueAddToRegistry() will be removed
 	by the pre-processor if configQUEUE_REGISTRY_SIZE is not defined or is
 	defined to be less than 1. */
+	printf("\nIn vQueueAddToRegistry\n");
 	vQueueAddToRegistry( xQueue, "Gen_Queue_Test" );
+	printf("\nvQueueAddToRegistry done\n");
 
 	/* Create the demo task and pass it the queue just created.  We are
 	passing the queue handle by value so it does not matter that it is
 	declared on the stack here. */
+	printf("\nprvSendFrontAndBAckTest creation\n");
 	xTaskCreate( prvSendFrontAndBackTest, "GenQ", configMINIMAL_STACK_SIZE, ( void * ) xQueue, uxPriority, NULL );
+	printf("\nprvSendFrontAndBAckTest created\n");
 
 	/* Create the mutex used by the prvMutexTest task. */
+	printf("\nxSemaphoreCreateMutex creation\n");
 	xMutex = xSemaphoreCreateMutex();
+	printf("\nxSemaphoreCreateMutex created\n");
 
 	/* vQueueAddToRegistry() adds the mutex to the registry, if one is
 	in use.  The registry is provided as a means for kernel aware
@@ -177,7 +186,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
 	is not being used.  The call to vQueueAddToRegistry() will be removed
 	by the pre-processor if configQUEUE_REGISTRY_SIZE is not defined or is
 	defined to be less than 1. */
+
+	printf("\nIn vQueueAddToRegistry\n");
 	vQueueAddToRegistry( ( QueueHandle_t ) xMutex, "Gen_Queue_Mutex" );
+	printf("\nvQueueAddToRegistry done\n");
 
 	/* Create the mutex demo tasks and pass it the mutex just created.  We are
 	passing the mutex handle by value so it does not matter that it is declared
@@ -664,6 +676,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex, Semaph
 
 static void prvLowPriorityMutexTask( void *pvParameters )
 {
+	printf("\nprvLowPriorityMutexTask created\n");
 SemaphoreHandle_t xMutex = ( SemaphoreHandle_t ) pvParameters, xLocalMutex;
 
 	#ifdef USE_STDIO
@@ -709,6 +722,7 @@ SemaphoreHandle_t xMutex = ( SemaphoreHandle_t ) pvParameters, xLocalMutex;
 
 static void prvMediumPriorityMutexTask( void *pvParameters )
 {
+	printf("\nprvMediumPriorityMutexTask created\n");
 	( void ) pvParameters;
 
 	for( ;; )
@@ -727,6 +741,7 @@ static void prvMediumPriorityMutexTask( void *pvParameters )
 
 static void prvHighPriorityMutexTask( void *pvParameters )
 {
+	printf("\nprvHighPriorityMutexTask created\n");
 SemaphoreHandle_t xMutex = ( SemaphoreHandle_t ) pvParameters;
 
 	for( ;; )

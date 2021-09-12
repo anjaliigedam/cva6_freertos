@@ -106,7 +106,7 @@
 // clib.c - putchar is updated to route printf to uart
 static uart_instance_t * const gp_my_uart = &g_uart_0;
 static int g_stdio_uart_init_done = 0;
-
+int64_t tick_count = 0;
 
 #ifndef STDIO_BAUD_RATE
 #define STDIO_BAUD_RATE  UART_115200_BAUD
@@ -123,15 +123,6 @@ equivalent in ticks using the portTICK_PERIOD_MS constant. */
 #define mainDONT_BLOCK                        ( 0UL )
 
 //#define mainDELAY_LOOP_COUNT                (1000UL) //test_2
-
-/*-----------------------------------------------------------*/
-
-
-/*-----------------------------------------------------------*/
-
-
-
-/*-----------------------------------------------------------*/
 /* test_1 */
 /*
  * The check timer callback function, as described at the top of this file.
@@ -147,11 +138,13 @@ void vApplicationMallocFailedHook( void );
  * FreeRTOS hook for when freertos is idling, enable in FreeRTOSConfig.
  */
 void vApplicationIdleHook( void );
-
+void vApplicationTickHook(void);
 /*
  * FreeRTOS hook for when a stackoverflow occurs, enable in FreeRTOSConfig.
  */
 void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
+
+
 
 /*-----------------------------------------------------------*/
 
@@ -159,7 +152,7 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
 /*-----------------------------------------------------------*/
 #define LEDS_ADDR     0x40000000
 #define LEDS (*((volatile unsigned int *) (LEDS_ADDR + 0x0)))
-static int LED_STATE = 0xa5;
+static int LED_STATE = 0x0f;
 
 void led_on(){
   //__asm volatile("sw 0x40000000, 0xffff");
@@ -185,6 +178,11 @@ void led_off(){
 void main_blinky( void );
 void main_full( void );
 void main_full2( void );
+void main_interrupt_demo( void );
+void main_polling_demo( void );
+void main_semaphore_demo( void );
+void semaphore_demo( void );
+
 
 void test_SingleTask_LEDBlink_LoopDelay( void );
 void test_2Task_LED_blink_vdelay( void );
@@ -193,83 +191,127 @@ void test_2( void );
 void test_3( void );
 void test_4( void );
 
-int dummy(){
+void uart1_rx_handler(uart_instance_t * this_uart)
+{
+    uint32_t rx_size; 
+    uint8_t rx_buff[32];
+    uint32_t rx_idx  = 0;
+    rx_size = UART_get_rx(this_uart, rx_buff, sizeof(rx_buff));  
+    printf("uart1_rx_handler interrupt called\n");
+}
+
+
+int dummyLoop(){
     int i;
-    for(i = 0; i < 100; i++)
+    for(i = 0; i < 1000000; i++)
     {
         i++;
     }
     return i;
 }
-void uart1_rx_handler(uart_instance_t * this_uart)
-{
-    uint32_t rx_size; 
-      uint8_t rx_buff[32];
-      uint32_t rx_idx  = 0;
-      rx_size = UART_get_rx(this_uart, rx_buff, sizeof(rx_buff));
-      
-    printf("uart1_rx_handler interrupt called\r\n");
+
+void LED_INIT_TEST(){
+    printf("LED_INIT_TESTING START\n");
+    for(int i = 0; i< 3; i++){
+        LEDS = 0x00;
+        dummyLoop();
+        LEDS = 0x01;
+        dummyLoop();
+        LEDS = 0x02;
+        dummyLoop();
+        LEDS = 0x04;
+        dummyLoop();
+        LEDS = 0x08;
+        dummyLoop();
+        LEDS = 0x10;
+        dummyLoop();
+        LEDS = 0x20;
+        dummyLoop();
+        LEDS = 0x40;
+        dummyLoop();
+        LEDS = 0x80;
+        dummyLoop();
+        
+        
+    }
+    
+    printf("LED_INIT_TESTING DONE\n");
+    dummyLoop();
 }
+
+
 
 int main( void )
 {
-    LEDInit();
-    if(!g_stdio_uart_init_done)
-    {
-        UART_init(gp_my_uart,
+    
+    UART_init(gp_my_uart,
                   STDIO_BAUD_RATE,
                   UART_DATA_8_BITS | UART_NO_PARITY | UART_ONE_STOP_BIT);
                       
         g_stdio_uart_init_done = 1;
-    }
     
-    //UART_polled_tx(gp_my_uart, (uint8_t *)ptr, len);
-    UART_polled_tx(gp_my_uart, "HELLO CVA6\r\n ", 13);
+      
+    dummyLoop();
+    printf("PLIC setup for UART RX interrupt setup from hyper-terminal done\n\n");
+    UART_set_rx_handler(gp_my_uart,
+                            uart1_rx_handler, // callback - no callback happening
+                            UART_FIFO_SINGLE_BYTE);
+    dummyLoop();
 
-    
+    printf("UART INIT DONE\n");
+    printf("HELLO CVA6\n");
+
+    LED_INIT_TEST();
+
     uint8_t rx_buff[32];
     uint32_t rx_idx  = 0;
     uint32_t rx_size  = 0;
 
     UART_set_rx_handler(gp_my_uart,
-                              uart1_rx_handler,
-                              UART_FIFO_SINGLE_BYTE);
+                            uart1_rx_handler,
+                            UART_FIFO_SINGLE_BYTE);
+    
 
-    /*
-    // pollig testcase
+    printf("Enter below key for demo:\n");
+    printf("a -> LED blinky with 2 task and communication between task usig Queue\n");
+    printf("b -> 3 task with interrupt on UART RX from hyper-terminal. HAS ISSUES UNDER DEBUG!. \n");
+    printf("c -> Polling on UART RX from hyper-terminal.\n");
+    printf("d -> main_full()\n");
+    printf("e -> Semaphore testcase\n");
+    //printf("f -> Semaphore testcase\n");
+    
     while(1)
-    { int i =0;
-        i = dummy();
-        
-        i = dummy();
-        
-          //printf("check for rx\r\n");
-          rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
-          if(rx_size > 0)
-          {
-              printf("Rx DONE size = %d\r\n", rx_size);
-              printf("%c\r\n",rx_buff[0]);
-          }
-          
+    { 
+        rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+        if(rx_size > 0)
+        {
+            printf("Received = %c (%d)\n", rx_buff[0],  rx_buff[0]);
+            break;
+        }
     }
-    */
 
-      
+    printf("switching to selected testcase\n");
 
-    /* main_blinky */
-    // main_blinky();
-    
-    /* main_full */
-    //main_full();
-    main_full2();
+    if(rx_buff[0] == 97){   // a
+        main_blinky();
+    }
+    else if(rx_buff[0] == 98){  // b  
+        main_interrupt_demo();
+    }
+    else if(rx_buff[0] == 99){  // c 
+        main_polling_demo();
+    }
+    else if(rx_buff[0] == 100){ // d
+        main_full();
+    }
+    else if(rx_buff[0] == 101){ // e
+        semaphore_demo();
+    }
+    //else if(rx_buff[0] == 102){
+    //    main_semaphore_demo();
+    //}
 
-    /* my_tests */
-    //test_SingleTask_LEDBlink_LoopDelay();
-    //test_2Task_LED_blink_vdelay();
-    //test_2();
-    //test_3(); //different task-priority and xTaskDelay 
-    //test_4(); //wait()/suspend() to check task-switching
-    
+    printf("ERROR - should not reach here");
     /* Exit FreeRTOS */
     return 0;
 }
@@ -286,29 +328,29 @@ static void prvCheckTimerCallback(__attribute__ ((unused)) TimerHandle_t xTimer 
     //printf("debug1");
     if( xAreBlockTimeTestTasksStillRunning() != pdPASS )
     {
-        printf("Error in block time test tasks \r\n");
+        printf("Error in block time test tasks \n");
         ulErrorFound |= ( 0x01UL << 1UL );
     }
     //printf("debug2");
     if( xAreCountingSemaphoreTasksStillRunning() != pdPASS )
     {
-        printf("Error in counting semaphore tasks \r\n");
+        printf("Error in counting semaphore tasks \n");
         ulErrorFound |= ( 0x01UL << 2UL );
     }
     //printf("debug3");
     if( xAreRecursiveMutexTasksStillRunning() != pdPASS )
     {
-        printf("Error in recursive mutex tasks \r\n");
+        printf("Error in recursive mutex tasks \n");
         ulErrorFound |= ( 0x01UL << 3UL );
     }
     //printf("debug4");
     if( ulErrorFound != pdFALSE )
     {
         __asm volatile("li t6, 0xbeefdead");
-        printf("Error found! \r\n");
+        printf("Error found! \n");
     }else{
         __asm volatile("li t6, 0xdeadbeef");
-        printf("PASS! \r\n");
+        printf("PASS! \n");
     }
 
     /* Stop scheduler */
@@ -328,10 +370,26 @@ void vApplicationMallocFailedHook( void )
     FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
     to query the size of free heap space that remains (although it does not
     provide information on how the remaining heap might be fragmented). */
+    printf("==== vApplicationMallocFailedHook === \n");
     taskDISABLE_INTERRUPTS();
     for( ;; );
 }
 /*-----------------------------------------------------------*/
+
+void vApplicationTickHook( void )
+{
+    /* vApplicationTickHook() will only be called if configUSE_IDLE_HOOK is set
+    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
+    task.  It is essential that code added to this hook function never attempts
+    to block in any way (for example, call xQueueReceive() with a block time
+    specified, or call vTaskDelay()).  If the application makes use of the
+    vTaskDelete() API function (as this demo application does) then it is also
+    important that vApplicationTickHook() is permitted to return to its calling
+    function, because it is the responsibility of the idle task to clean up
+    memory allocated by the kernel to any task that has since been deleted. */
+    tick_count++;
+    //printf("TICK = %d\n", tick_count);
+}
 
 void vApplicationIdleHook( void )
 {
@@ -344,6 +402,7 @@ void vApplicationIdleHook( void )
     important that vApplicationIdleHook() is permitted to return to its calling
     function, because it is the responsibility of the idle task to clean up
     memory allocated by the kernel to any task that has since been deleted. */
+    //printf("IDLE TASK\n");
 }
 /*-----------------------------------------------------------*/
 

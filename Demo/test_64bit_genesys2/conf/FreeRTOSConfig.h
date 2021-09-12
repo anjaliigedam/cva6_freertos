@@ -88,19 +88,34 @@
 extern uint32_t SystemCoreClock;
 
 #define configUSE_PREEMPTION			1
+//#define configUSE_TIME_SLICING          0 //added for debug semaphore
+/*
 #define configUSE_IDLE_HOOK				0
 #define configUSE_TICK_HOOK				0
+*/
+
+/*Added below from core-v-freertos*/
+#define configUSE_IDLE_HOOK				1  //added for debug semaphore
+#define configUSE_TICK_HOOK				1  //added for debug semaphore
+/*Added above from core-v-freertos*/
+
 //#define configCPU_CLOCK_HZ			( ( unsigned long ) 100000000 )
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 50000000 ) // 50MHz
 //#define configTICK_CLOCK_HZ			( ( unsigned long ) 1000000 )
 #define configTICK_CLOCK_HZ			( ( unsigned long ) 50000000 ) // 50MHz
-#define configTICK_RATE_HZ			( ( TickType_t ) 100 )//original
+#define configTICK_RATE_HZ			( ( TickType_t ) 1000 )//original
 //#define configTICK_RATE_HZ			( ( TickType_t ) 10000 )//genesys2
 //#define configTICK_RATE_HZ			( ( TickType_t ) 100000 )//test 2
 //#define configTICK_RATE_HZ			( ( TickType_t ) 10000 ) //test-2 verilator
 #define configMAX_PRIORITIES		( 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 1024 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 100 * 1024 ) )
+//#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 2048 ) //added to debug semaphore but with this setting polling and interrupt task doesn't work
+
+// original
+//#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 100 * 1024 ) )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 200 * 1024 ) )
+
+
 #define configMAX_TASK_NAME_LEN			( 16 )
 #define configUSE_TRACE_FACILITY		1
 #define configUSE_16_BIT_TICKS			0
@@ -135,6 +150,13 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
 #define INCLUDE_eTaskGetState			1
+
+/*Added below from core-v-freertos*/
+#define INCLUDE_xTimerPendFunctionCall		1
+#define INCLUDE_xTaskAbortDelay				1
+#define INCLUDE_xTaskGetHandle				1
+#define INCLUDE_xSemaphoreGetMutexHolder	1
+/*Added above from core-v-freertos*/
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */

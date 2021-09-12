@@ -239,7 +239,6 @@ static void prvProcessTimerOrBlockTask( const TickType_t xNextExpireTime, BaseTy
 
 BaseType_t xTimerCreateTimerTask( void )
 {
-	printf("timer debug 1");
 	
 	BaseType_t xReturn = pdFAIL;
 
@@ -247,9 +246,7 @@ BaseType_t xTimerCreateTimerTask( void )
 	configUSE_TIMERS is set to 1.  Check that the infrastructure used by the
 	timer service task has been created/initialised.  If timers have already
 	been created then the initialisation will already have been performed. */
-	printf("timer debug 1");
 	prvCheckForValidListAndQueue();
-	printf("timer debug 2");
 
 	if( xTimerQueue != NULL )
 	{
@@ -261,10 +258,8 @@ BaseType_t xTimerCreateTimerTask( void )
 		}
 		#else
 		{
-			printf("timer debug 3");
 			/* Create the timer task without storing its handle. */
 			xReturn = xTaskCreate( prvTimerTask, "Tmr Svc", ( uint16_t ) configTIMER_TASK_STACK_DEPTH, NULL, ( ( UBaseType_t ) configTIMER_TASK_PRIORITY ) | portPRIVILEGE_BIT, NULL);
-			printf("timer debug 4");
 		}
 		#endif
 	}
@@ -272,7 +267,6 @@ BaseType_t xTimerCreateTimerTask( void )
 	{
 		mtCOVERAGE_TEST_MARKER();
 	}
-	printf("timer debug 5 xRetuern = %d", xReturn);
 	configASSERT( xReturn );
 	return xReturn;
 }
