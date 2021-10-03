@@ -74,6 +74,7 @@
  */
 
 /* Kernel includes. */
+#include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -153,6 +154,7 @@ TickType_t xTimeToBlock, xBlockedTime;
         Test 1
 
         Simple block time wakeup test on queue receives. */
+		printf("\nTest 1 : vPrimaryBlockTimeTestTask\n");
 		for( xItem = 0; xItem < bktQUEUE_LENGTH; xItem++ )
 		{
 			/* The queue is empty. Attempt to read from the queue using a block
@@ -192,6 +194,8 @@ TickType_t xTimeToBlock, xBlockedTime;
         Simple block time wakeup test on queue sends.
 
 		First fill the queue.  It should be empty so all sends should pass. */
+		printf("\nTest 2 : vPrimaryBlockTimeTestTask\n");
+
 		for( xItem = 0; xItem < bktQUEUE_LENGTH; xItem++ )
 		{
 			if( xQueueSend( xTestQueue, &xItem, bktDONT_BLOCK ) != pdPASS )
@@ -251,6 +255,8 @@ TickType_t xTimeToBlock, xBlockedTime;
 		full queue. */
 		xRunIndicator = 0;
 		vTaskResume( xSecondary );
+
+		printf("\nTest 3 : vPrimaryBlockTimeTestTask\n");
 
 		/* We need to wait a little to ensure the other task executes. */
 		while( xRunIndicator != bktRUN_INDICATOR )
@@ -319,6 +325,9 @@ TickType_t xTimeToBlock, xBlockedTime;
 		The other task blocks attempting to read from the queue.
 
 		Empty the queue.  We should find that it is full. */
+
+		printf("\nTest 4 : vPrimaryBlockTimeTestTask\n");
+
 		for( xItem = 0; xItem < bktQUEUE_LENGTH; xItem++ )
 		{
 			if( xQueueReceive( xTestQueue, &xData, bktDONT_BLOCK ) != pdPASS )
@@ -403,6 +412,7 @@ BaseType_t xData;
         Test 1 and 2
 
 		This task does does not participate in these tests. */
+		printf("\nTest 1 & 2 : vSecondaryBlockTimeTestTask\n");
 		vTaskSuspend( NULL );
 
 		/*********************************************************************
@@ -411,6 +421,7 @@ BaseType_t xData;
 		The first thing we do is attempt to read from the queue.  It should be
 		full so we block.  Note the time before we block so we can check the
 		wake time is as per that expected. */
+		printf("\nTest 3 : vSecondaryBlockTimeTestTask\n");
 		xTimeWhenBlocking = xTaskGetTickCount();
 
 		/* We should unblock after bktTIME_TO_BLOCK having not sent
@@ -447,6 +458,7 @@ BaseType_t xData;
         Test 4
 
 		As per test three, but with the send and receive reversed. */
+		printf("\nTest 4 : vSecondaryBlockTimeTestTask\n");
 		xTimeWhenBlocking = xTaskGetTickCount();
 
 		/* We should unblock after bktTIME_TO_BLOCK having not received

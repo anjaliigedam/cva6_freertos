@@ -113,7 +113,8 @@ extern uint32_t SystemCoreClock;
 
 // original
 //#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 100 * 1024 ) )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 200 * 1024 ) )
+//#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 200 * 1024 ) )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 300 * 1024 ) )
 
 
 #define configMAX_TASK_NAME_LEN			( 16 )

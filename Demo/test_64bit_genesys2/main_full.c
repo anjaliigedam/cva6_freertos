@@ -166,34 +166,34 @@ void main_full( void )
 	functionality, but do demonstrate how to use the FreeRTOS API and test the
 	kernel port. */
 	
-	printf("vStartDynamicPriorityTasks()\r\n");
-	vStartDynamicPriorityTasks();
+	//printf("vStartDynamicPriorityTasks()\r\n");
+	//vStartDynamicPriorityTasks();
 	
-	//printf("vCreateBlockTimeTasks()\r\n");
-	//vCreateBlockTimeTasks();
+	printf("vCreateBlockTimeTasks()\r\n");
+	vCreateBlockTimeTasks();
 	
-	printf("vStartGenericQueueTasks(\n");
-	vStartGenericQueueTasks( tskIDLE_PRIORITY );
+	//printf("vStartGenericQueueTasks\n");
+	//vStartGenericQueueTasks( tskIDLE_PRIORITY );
 	
-	printf("vStartRecursiveMutexTasks()\n");
-	vStartRecursiveMutexTasks();
+	//printf("vStartRecursiveMutexTasks()\n");
+	//vStartRecursiveMutexTasks();
 	
 	//printf("vStartTimerDemoTask\n");
 	//vStartTimerDemoTask( mainTIMER_TEST_PERIOD );
 	
-	printf("vStartEventGroupTasks()\n");
-	vStartEventGroupTasks();
+	//printf("vStartEventGroupTasks()\n");
+	//vStartEventGroupTasks();
 	
-	printf("vStartTaskNotifyTask()\n");
-	vStartTaskNotifyTask();
+	//printf("vStartTaskNotifyTask()\n");
+	//vStartTaskNotifyTask();
 	
 	//printf("vCreateAbortDelayTasks()\n");
 	//vCreateAbortDelayTasks();
 	
-	printf("vStartCountingSemaphoreTasks()\n");
-	vStartCountingSemaphoreTasks();
+	//printf("vStartCountingSemaphoreTasks()\n");
+	//vStartCountingSemaphoreTasks();
 	
-	//printf("vStartMessageBufferTasks(\n");
+	//printf("vStartMessageBufferTasks\n");
 	//vStartMessageBufferTasks( configMINIMAL_STACK_SIZE  );
 	
 	
@@ -216,12 +216,13 @@ void main_full( void )
 	//			 tskIDLE_PRIORITY, 				/* Priority of the task. */
 	//			 NULL );						/* Can be used to pass out a handle to the created task. */
 
-	//printf("xTaskCreate prvRegTestTaskEntry2\r\n");
-	//xTaskCreate( prvRegTestTaskEntry2, "Reg2", 
-	//	mainREG_TEST_STACK_SIZE_WORDS, 
-	//	mainREG_TEST_TASK_2_PARAMETER, 
-	//	tskIDLE_PRIORITY, NULL );
-	
+/*
+	printf("xTaskCreate prvRegTestTaskEntry2\r\n");
+	xTaskCreate( prvRegTestTaskEntry2, "Reg2", 
+		mainREG_TEST_STACK_SIZE_WORDS, 
+		mainREG_TEST_TASK_2_PARAMETER, 
+		tskIDLE_PRIORITY, NULL );
+*/	
 	/* Create the task that performs the 'check' functionality,	as described at
 	the top of this file. */
 
@@ -269,7 +270,7 @@ static void prvCheckTask( void *pvParameters )
 
 	/* Output "pass", then an additional '.' character for each successful
 	loop. */
-	vSendString("Pass\r\n");
+	vSendString("\nPass\r\n");
 
 	/* Initialise xLastExecutionTime so the first call to vTaskDelayUntil()
 	works correctly. */
@@ -299,6 +300,8 @@ static void prvCheckTask( void *pvParameters )
 		
 		//Check all the demo tasks (other than the flash tasks) to ensure
 		// that they are all still running, and that none have detected an error. 
+		
+	/*	
 		printf("dynamic priority tasks\n");
 		if( xAreDynamicPriorityTasksStillRunning() == pdFALSE )
 		{
@@ -309,16 +312,23 @@ static void prvCheckTask( void *pvParameters )
 		else{
 			printf("Dynamic Priority PASS\n");
 		}
+	*/	
 
-		/*
+		
 		printf("time test tasks\n");
 		if( xAreBlockTimeTestTasksStillRunning() == pdFALSE )
 		{
 			pcStatusMessage = "ERROR: Block time demo/tests.\r\n";
+			printf("Timer test tasks FAIL\n");
 		}
-		*/
+		else
+		{
+			printf("\ntimer test tasks: Pass\n");
+		}
 		
-		//printf("generic queue tasks\n");
+	/*	
+		printf("generic queue tasks\n");
+		
 		if( xAreGenericQueueTasksStillRunning() == pdFALSE )
 		{
 			pcStatusMessage = "ERROR: Generic queue demo/tests.\r\n";
@@ -338,10 +348,11 @@ static void prvCheckTask( void *pvParameters )
 				printf("Generic Queue PASS \n");
 			}
 			*/
-		}
+	//	}
+		
 		
 
-		
+	/*	
 		printf("recursive mutex tasks\n");
 		if( xAreRecursiveMutexTasksStillRunning() == pdFALSE )
 		{
@@ -352,7 +363,7 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("Recursive Mutex PASS\n");
 		}
-				
+	*/			
 
 		/*
 		printf("timer demo tasks\n");
@@ -366,7 +377,7 @@ static void prvCheckTask( void *pvParameters )
 		}
 		*/
 
-		
+	/*	
 		printf("event group tasks\n");
 		if( xAreEventGroupTasksStillRunning() == pdFALSE )
 		{
@@ -378,8 +389,9 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("Event Group PASS\n");
 		}
-		
+	*/	
 
+	/*	
 		printf("notification tasks\n");
 		if( xAreTaskNotificationTasksStillRunning() == pdFALSE )
 		{
@@ -390,6 +402,7 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("Notification task pass\n");
 		}
+	*/	
 
 		//printf("delay tasks\n");
 		//if( xAreAbortDelayTestTasksStillRunning() == pdFALSE )
@@ -397,7 +410,7 @@ static void prvCheckTask( void *pvParameters )
 		//	pcStatusMessage = "ERROR: Abort delay.\r\n";
 		//}
 		
-		
+	/*	
 		printf("counting semaphore tasks\n");
 		if( xAreCountingSemaphoreTasksStillRunning() == pdFALSE )
 		{
@@ -408,7 +421,7 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("counting semaphore pass\n");
 		}
-
+	*/	
 
 		/*
 		printf("create tasks\n");
@@ -447,14 +460,14 @@ static void prvCheckTask( void *pvParameters )
 		//ulLastRegTest1Value = ulRegTest1LoopCounter;
 		
 		/* Check that the register test 2 task is still running. */
-		/*
+	/*	
 		printf("ulLastRegTest2Value = %d ulRegTest2LoopCounter = %d", ulLastRegTest2Value, ulRegTest2LoopCounter);
 		if( ulLastRegTest2Value == ulRegTest2LoopCounter )
 		{
 			pcStatusMessage = "ERROR: Register test 2.\r\n\r";
 		}
 		ulLastRegTest2Value = ulRegTest2LoopCounter;
-		*/
+	*/	
 
 		printf("toggle led\r\n");
 		/* Write the status message to the UART. */

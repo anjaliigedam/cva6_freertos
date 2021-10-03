@@ -10,7 +10,7 @@ OBJCOPY	= $(TARGET)-objcopy
 OBJDUMP	= $(TARGET)-objdump
 AR		= $(TARGET)-ar
 RANLIB	= $(TARGET)-ranlib
-CCPATH	= ~/riscv
+CCPATH	= ~/riscv_fpga
 
 PROG	= riscv-spike
 CRT0	= arch/boot.S

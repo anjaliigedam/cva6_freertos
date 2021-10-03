@@ -59,7 +59,7 @@ include ./Makefile.inc
 # Root of RISC-V tools installation. Note that we expect to find the spike
 # simulator header files here under $(RISCV)/include/spike .
 #RISCV ?= /opt/riscv
-RISCV ?= ~/riscv
+RISCV ?= ~/riscv_fpga
 
 FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/croutine.c \
@@ -98,9 +98,10 @@ DEMO_SRC = \
 	main_blinky.c \
 	main_interrupt_demo.c \
 	main_polling_demo.c \
-	main_mutex_demo.c \
 	semaphore_demo.c \
 	main_full.c \
+	attack.c \
+	attack_with_DP.c \
 	main_full2.c \
 	my_tests.c \
 	../Common/Full/dynamic.c \
@@ -131,7 +132,11 @@ CFLAGS = \
 	-fomit-frame-pointer -fno-strict-aliasing -fno-builtin \
 	-D__gracefulExit -mcmodel=medany -march=rv64ima -DUART_PRINTF \
 	-DINCLUDE_xTimerPendFunctionCall=1
-	
+
+#	-D__gracefulExit -mcmodel=medany -march=rv64ima -DUART_PRINTF
+#Commented for verilator from above
+
+
 #-fPIC 
 
 GCCVER 	= $(shell $(GCC) --version | grep gcc | cut -d" " -f9)

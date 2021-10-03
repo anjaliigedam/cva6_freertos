@@ -112,6 +112,8 @@ int64_t tick_count = 0;
 #define STDIO_BAUD_RATE  UART_115200_BAUD
 #endif
 
+// For Verilator = 1, for FPGA = 0
+int use_verilator = 0;
 
 /* The period after which the check timer will expire provided no errors have
 been reported by any of the standard demo tasks.  ms are converted to the
@@ -180,9 +182,9 @@ void main_full( void );
 void main_full2( void );
 void main_interrupt_demo( void );
 void main_polling_demo( void );
-void main_semaphore_demo( void );
 void semaphore_demo( void );
-
+void attack_demo( void );
+void attack_without_disruptor( void );
 
 void test_SingleTask_LEDBlink_LoopDelay( void );
 void test_2Task_LED_blink_vdelay( void );
@@ -278,18 +280,25 @@ int main( void )
     printf("c -> Polling on UART RX from hyper-terminal.\n");
     printf("d -> main_full()\n");
     printf("e -> Semaphore testcase\n");
-    //printf("f -> Semaphore testcase\n");
-    
-    while(1)
-    { 
-        rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
-        if(rx_size > 0)
-        {
-            printf("Received = %c (%d)\n", rx_buff[0],  rx_buff[0]);
-            break;
+    printf("f -> Attack demo without Disruptor\n");
+    printf("g -> Attack demo with Disruptor\n");
+
+    if(use_verilator == 0)
+    {
+        while(1)
+        { 
+            rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+            if(rx_size > 0)
+            {
+                printf("Received = %c (%d)\n", rx_buff[0],  rx_buff[0]);
+                break;
+            }
         }
     }
-
+    else
+    {
+        rx_buff[0] = 102;//f
+    }
     printf("switching to selected testcase\n");
 
     if(rx_buff[0] == 97){   // a
@@ -307,9 +316,12 @@ int main( void )
     else if(rx_buff[0] == 101){ // e
         semaphore_demo();
     }
-    //else if(rx_buff[0] == 102){
-    //    main_semaphore_demo();
-    //}
+    else if(rx_buff[0] == 102){ //f
+        attack_demo();
+    }
+    else if(rx_buff[0] == 103){ //g
+        attack_without_disruptor();
+    }
 
     printf("ERROR - should not reach here");
     /* Exit FreeRTOS */
