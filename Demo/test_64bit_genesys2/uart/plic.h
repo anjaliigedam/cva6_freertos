@@ -29,6 +29,7 @@
 #define MSS_PLIC_H
 
 #include <stdint.h>
+#include <stdio.h>
 #include "encoding.h"
 
 #include "hal_assert.h"
@@ -48,6 +49,7 @@
 
 typedef enum
 {
+    // TODO ANJALI - made uart 0 as its connected to SRC0
     NoInterrupt_IRQHandler         = 0,    
     UART_0_PLIC_IRQHandler         = 1,
     QSPI_0_PLIC_IRQHandler         = 2,
@@ -107,10 +109,13 @@ typedef struct
 typedef struct
 {
     
-    volatile uint32_t RESERVED0;
+    volatile uint32_t RESERVED0; //c000000 this is a 4-byte v ariable
     /*-------------------- Source Priority --------------------*/
-    volatile uint32_t SOURCE_PRIORITY[PLIC_NUM_SOURCES];
-    volatile uint32_t RESERVED1[(0x1000/4) - (PLIC_NUM_SOURCES + 1)];
+    volatile uint32_t SOURCE_PRIORITY[PLIC_NUM_SOURCES]; //c000000+4 because this is array 30
+    //volatile uint32_t SOURCE_PRIORITY[0]; //c000004
+    //volatile uint32_t SOURCE_PRIORITY[1]; //c000008
+    
+    volatile uint32_t RESERVED1[(0x1000/4) - (PLIC_NUM_SOURCES + 1)]; 
 
     /*-------------------- Pending array --------------------*/
     volatile const uint32_t PENDING_ARRAY[PLIC_SET_UP_REGISTERS];
@@ -125,7 +130,7 @@ typedef struct
     volatile uint32_t RESERVED3a[(0x80/4) - PLIC_SET_UP_REGISTERS];
 
     volatile uint32_t HART0_SMODE_ENA[PLIC_SET_UP_REGISTERS];
-    volatile uint32_t RESERVED3[(0x80/4) - PLIC_SET_UP_REGISTERS];
+    volatile uint32_t RESERVED3b[(0x80/4) - PLIC_SET_UP_REGISTERS];
 
     volatile uint32_t RESERVED4[(0x200000-0x2000)/4 - PLIC_SET_UP_REGISTERS];
 
@@ -158,6 +163,8 @@ typedef struct
 
 static inline void PLIC_init(void)
 {
+    printf(__func__);printf("\n");
+
     uint32_t inc;
     uint64_t hart_id  = read_csr(mhartid);
 
@@ -183,16 +190,30 @@ static inline void PLIC_init(void)
  */
 static inline void PLIC_EnableIRQ(PLIC_IRQn_Type IRQn)
 {
+    printf("PLIC_EnableIRQ IRQn (1 = uart) = %d\n",IRQn);
+    
     uint64_t hart_id  = read_csr(mhartid);
 
     uint32_t current;
+
+    for(int inc = 0U; inc < PLIC_NUM_SOURCES; ++inc)
+    {
+        /* priority must be greater than threshold to be enabled, so setting to
+         * 7 disables */
+        //PLIC->SOURCE_PRIORITY[inc]  = 0U;
+        PLIC->SOURCE_PRIORITY[inc]  = 1U; //priority = 1
+    }
 
     switch(hart_id)
     {
         case 0:
             current  = PLIC->HART0_MMODE_ENA[IRQn / 32U];
-            current |= (uint32_t)1 << (IRQn % 32U);
+            printf(" old Interrupt Enable = %d \n", current);
+           
+            current |= (uint32_t)1 << (IRQn % 32U); // OR - dont clear interrupt
             PLIC->HART0_MMODE_ENA[IRQn / 32U]  = current;
+            
+            printf(" Interrupt Enable = %d curr = %d \n", PLIC->HART0_MMODE_ENA[IRQn / 32U], current );
             break;
         default:
             break;
@@ -213,6 +234,8 @@ static inline void PLIC_EnableIRQ(PLIC_IRQn_Type IRQn)
  */
 static inline void PLIC_DisableIRQ(PLIC_IRQn_Type IRQn)
 {
+    printf(__func__);printf("\n");
+
     uint32_t current;
     uint64_t hart_id  = read_csr(mhartid);
 
@@ -234,6 +257,8 @@ static inline void PLIC_DisableIRQ(PLIC_IRQn_Type IRQn)
  */
 static inline void PLIC_SetPriority(PLIC_IRQn_Type IRQn, uint32_t priority)
 {
+    printf(__func__);printf("\n");
+
     if((IRQn > NoInterrupt_IRQHandler) && (IRQn < PLIC_NUM_SOURCES))
     {
         PLIC->SOURCE_PRIORITY[IRQn-1] = priority;
@@ -246,6 +271,7 @@ static inline void PLIC_SetPriority(PLIC_IRQn_Type IRQn, uint32_t priority)
  */
 static inline uint32_t PLIC_GetPriority(PLIC_IRQn_Type IRQn)
 {
+    printf(__func__);printf("\n");
     uint32_t ret_val = 0U;
 
     if((IRQn > NoInterrupt_IRQHandler) && (IRQn < PLIC_NUM_SOURCES))
@@ -267,6 +293,8 @@ static inline uint32_t PLIC_GetPriority(PLIC_IRQn_Type IRQn)
  */
 static inline uint32_t PLIC_ClaimIRQ(void)
 {
+
+    printf("\n");printf(__func__);printf("\n");
     unsigned long hart_id = read_csr(mhartid);
 
     return PLIC->TARGET[hart_id].CLAIM_COMPLETE;
@@ -278,6 +306,7 @@ static inline uint32_t PLIC_ClaimIRQ(void)
  */
 static inline void PLIC_CompleteIRQ(uint32_t source)
 {
+    printf(__func__);printf("\n");
     unsigned long hart_id = read_csr(mhartid);
 
     PLIC->TARGET[hart_id].CLAIM_COMPLETE = source;
@@ -297,6 +326,8 @@ static inline void PLIC_CompleteIRQ(uint32_t source)
  */
 static inline void PLIC_SetPriority_Threshold(uint32_t threshold)
 {
+    printf(__func__);printf("\n");
+
     uint64_t hart_id  = read_csr(mhartid);
     //const unsigned long lookup[5U] = {0U, 1U, 3U, 5U, 7U};
 
@@ -312,9 +343,12 @@ static inline void PLIC_SetPriority_Threshold(uint32_t threshold)
  */
 static inline void PLIC_ClearPendingIRQ(void)
 {
-    volatile uint32_t int_num  = PLIC_ClaimIRQ();
-    volatile int32_t wait_possible_int;
+    printf(__func__);printf("\n");
 
+    volatile uint32_t int_num  = PLIC_ClaimIRQ();
+    
+    volatile int32_t wait_possible_int;
+    printf("1 int_num = %d\n", int_num);
     while ( int_num != NoInterrupt_IRQHandler)
     {
         uint8_t disable = EXT_IRQ_KEEP_ENABLED;
@@ -325,7 +359,10 @@ static inline void PLIC_ClearPendingIRQ(void)
         {
             wait_possible_int--;
         }
+
         int_num  = PLIC_ClaimIRQ(); /* obtain interrupt, auto clears  */
+        printf("2 int_num = %d\n", int_num);
+    
     }
 }
 
@@ -334,6 +371,8 @@ static inline void PLIC_ClearPendingIRQ(void)
  */
 static inline void PLIC_init_on_reset(void)
 {
+    printf(__func__);printf("\n");
+
     uint32_t inc;
 
     /* default all priorities so effectively disabled */
@@ -341,7 +380,8 @@ static inline void PLIC_init_on_reset(void)
     {
         /* priority must be greater than threshold to be enabled, so setting to
          * 7 disables */
-        PLIC->SOURCE_PRIORITY[inc]  = 0U;
+        //PLIC->SOURCE_PRIORITY[inc]  = 0U;
+        PLIC->SOURCE_PRIORITY[inc]  = 1U;
     }
 
     for(inc = 0U; inc < NUM_CLAIM_REGS; ++inc)

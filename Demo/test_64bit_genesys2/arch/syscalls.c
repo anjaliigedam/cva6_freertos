@@ -156,6 +156,10 @@ void vSyscallInit(void)
 /* Trap handeler */
 unsigned long ulSyscallTrap(long cause, long epc, long regs[32])
 {
+        printf("\n\ntrap called\n\n");
+        for(int i = 0; i < 100000000; i++)
+        {
+        }
 	long returnValue = 0;
 
 	if (cause != CAUSE_MACHINE_ECALL) {

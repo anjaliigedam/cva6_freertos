@@ -166,17 +166,17 @@ void main_full( void )
 	functionality, but do demonstrate how to use the FreeRTOS API and test the
 	kernel port. */
 	
-	//printf("vStartDynamicPriorityTasks()\r\n");
-	//vStartDynamicPriorityTasks();
+	printf("vStartDynamicPriorityTasks()\r\n");
+	vStartDynamicPriorityTasks();
 	
-	printf("vCreateBlockTimeTasks()\r\n");
-	vCreateBlockTimeTasks();
+	//printf("vCreateBlockTimeTasks()\r\n");
+	//vCreateBlockTimeTasks();
 	
-	//printf("vStartGenericQueueTasks\n");
-	//vStartGenericQueueTasks( tskIDLE_PRIORITY );
+	printf("vStartGenericQueueTasks\n");
+	vStartGenericQueueTasks( tskIDLE_PRIORITY );
 	
-	//printf("vStartRecursiveMutexTasks()\n");
-	//vStartRecursiveMutexTasks();
+	printf("vStartRecursiveMutexTasks()\n");
+	vStartRecursiveMutexTasks();
 	
 	//printf("vStartTimerDemoTask\n");
 	//vStartTimerDemoTask( mainTIMER_TEST_PERIOD );
@@ -190,8 +190,8 @@ void main_full( void )
 	//printf("vCreateAbortDelayTasks()\n");
 	//vCreateAbortDelayTasks();
 	
-	//printf("vStartCountingSemaphoreTasks()\n");
-	//vStartCountingSemaphoreTasks();
+	printf("vStartCountingSemaphoreTasks()\n");
+	vStartCountingSemaphoreTasks();
 	
 	//printf("vStartMessageBufferTasks\n");
 	//vStartMessageBufferTasks( configMINIMAL_STACK_SIZE  );
@@ -301,7 +301,7 @@ static void prvCheckTask( void *pvParameters )
 		//Check all the demo tasks (other than the flash tasks) to ensure
 		// that they are all still running, and that none have detected an error. 
 		
-	/*	
+		
 		printf("dynamic priority tasks\n");
 		if( xAreDynamicPriorityTasksStillRunning() == pdFALSE )
 		{
@@ -312,9 +312,9 @@ static void prvCheckTask( void *pvParameters )
 		else{
 			printf("Dynamic Priority PASS\n");
 		}
-	*/	
+	
 
-		
+	/*	
 		printf("time test tasks\n");
 		if( xAreBlockTimeTestTasksStillRunning() == pdFALSE )
 		{
@@ -325,8 +325,8 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("\ntimer test tasks: Pass\n");
 		}
+	*/	
 		
-	/*	
 		printf("generic queue tasks\n");
 		
 		if( xAreGenericQueueTasksStillRunning() == pdFALSE )
@@ -348,11 +348,11 @@ static void prvCheckTask( void *pvParameters )
 				printf("Generic Queue PASS \n");
 			}
 			*/
-	//	}
+		}
 		
 		
 
-	/*	
+		
 		printf("recursive mutex tasks\n");
 		if( xAreRecursiveMutexTasksStillRunning() == pdFALSE )
 		{
@@ -363,7 +363,7 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("Recursive Mutex PASS\n");
 		}
-	*/			
+				
 
 		/*
 		printf("timer demo tasks\n");
@@ -410,7 +410,7 @@ static void prvCheckTask( void *pvParameters )
 		//	pcStatusMessage = "ERROR: Abort delay.\r\n";
 		//}
 		
-	/*	
+		
 		printf("counting semaphore tasks\n");
 		if( xAreCountingSemaphoreTasksStillRunning() == pdFALSE )
 		{
@@ -421,7 +421,7 @@ static void prvCheckTask( void *pvParameters )
 		{
 			printf("counting semaphore pass\n");
 		}
-	*/	
+		
 
 		/*
 		printf("create tasks\n");

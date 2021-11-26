@@ -4,6 +4,7 @@
         "freertosconfig.h": "c",
         "syscalls.h": "c",
         "clib.h": "c",
-        "plic.h": "c"
+        "plic.h": "c",
+        "encoding.h": "c"
     }
 }

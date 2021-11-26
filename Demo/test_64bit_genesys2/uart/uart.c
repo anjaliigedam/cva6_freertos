@@ -329,13 +329,17 @@ UART_get_rx
     {
         status = this_uart->hw_reg->LSR;
         this_uart->status |= status;
-        //printf("status = %d\n", status);
+        //printf("UART_get_rx() LSR status = %d\n", status);
+        
         while (((status & UART_DATA_READY) != 0u) && (rx_size < buff_size))
         {
             rx_buff[rx_size] = this_uart->hw_reg->RBR;
             ++rx_size;
             status = this_uart->hw_reg->LSR;
+            //printf("1 UART_get_rx() LSR status = %d\n", status);
             this_uart->status |= status;
+            //printf("2 UART_get_rx() LSR status = %d\n", status);
+        
         }
     }
 
@@ -384,7 +388,8 @@ UART_set_rx_handler
 {
     //ASSERT(handler != INVALID_IRQ_HANDLER );
     //ASSERT(trigger_level < UART_FIFO_INVALID_TRIG_LEVEL);
-
+    PLIC_init();
+    
     if ((handler != INVALID_IRQ_HANDLER) &&
        (trigger_level < UART_FIFO_INVALID_TRIG_LEVEL))
     {
@@ -518,6 +523,11 @@ UART_get_rx_status
      */
     this_uart->status |= (this_uart->hw_reg->LSR);
     status = (this_uart->status & STATUS_ERROR_MASK);
+    
+    printf("UART_get_rx_status = %d", status);
+    printf("UART_get_rx_LSR = %d", this_uart->hw_reg->LSR);
+
+
     /* Clear the sticky status after reading */
     this_uart->status = 0u;
 
@@ -547,7 +557,8 @@ UART_get_modem_status
      * Bit 7 - Data Carrier Detect
      */
     status = this_uart->hw_reg->MSR;
-
+    printf("UART_get_modem_status = %d", status);
+    
     return status;
 }
 
@@ -803,12 +814,13 @@ enable_irq
 
     if (&g_uart_0 == this_uart )
     {
-        printf("UART assign plic_num\n");
+        printf("enable_irq() UART assign plic_num = %d\n",plic_num);
         plic_num = UART_0_PLIC_IRQHandler;
 
     }
     else
     {
+        printf("ASSERT(0) called\n");
         ASSERT(0); /*Alternative case has been considered*/
     }
 

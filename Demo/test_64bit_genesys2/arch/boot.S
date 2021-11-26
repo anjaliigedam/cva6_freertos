@@ -83,7 +83,8 @@
 #endif
 
 boot:
-    li t6, 0x1800
+    // li t6, 0x1800   // machine mode
+    li t6, 0x1880   // MPP = machine mode/3 + MPIE + MIE   
     csrw mstatus, t6
     j _mstart
 
@@ -91,6 +92,9 @@ boot:
 	.globl _mstart
 /* Startup code */
 _mstart:
+    li t6, 0x1888   // MPP = machine mode/3 + MPIE + MIE   
+    csrw mstatus, t6
+    
     la t0, trap_entry
     csrw mtvec, t0
     li	x1, 0
@@ -98,7 +102,7 @@ _mstart:
     li	x3, 0
     li	x4, 0
     li	x5, 0
-	li	x6, 0
+    li	x6, 0
     li	x7, 0
     li	x8, 0
     li	x9, 0

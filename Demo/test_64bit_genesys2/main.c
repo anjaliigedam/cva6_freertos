@@ -102,6 +102,8 @@
 #include "arch/syscalls.h"
 #include "arch/clib.h"
 #include "uart/uart.h"
+#include "encoding.h"
+
 
 // clib.c - putchar is updated to route printf to uart
 static uart_instance_t * const gp_my_uart = &g_uart_0;
@@ -114,6 +116,7 @@ int64_t tick_count = 0;
 
 // For Verilator = 1, for FPGA = 0
 int use_verilator = 0;
+
 
 /* The period after which the check timer will expire provided no errors have
 been reported by any of the standard demo tasks.  ms are converted to the
@@ -176,6 +179,11 @@ void led_off(){
 
 }
 
+//----------------------------------------
+// main_baremetal.c
+void main_baremetal( void );
+
+//----------------------------------------
 
 void main_blinky( void );
 void main_full( void );
@@ -200,15 +208,29 @@ void uart1_rx_handler(uart_instance_t * this_uart)
     uint32_t rx_idx  = 0;
     rx_size = UART_get_rx(this_uart, rx_buff, sizeof(rx_buff));  
     printf("uart1_rx_handler interrupt called\n");
+    dummyLoop();
+    dummyLoop();
+    dummyLoop();
+    dummyLoop();
+    
 }
 
 
 int dummyLoop(){
     int i;
-    for(i = 0; i < 1000000; i++)
+    int loop_count = 100000;
+    
+    if(use_verilator == 1)
+    {
+        loop_count = 10;
+    }
+
+    //for
+    for(i = 0; i < loop_count; i++)
     {
         i++;
     }
+
     return i;
 }
 
@@ -245,36 +267,60 @@ void LED_INIT_TEST(){
 
 int main( void )
 {
+    printf("main.c\n");
+    //set_csr(mie, 0xffffffff);
+    //set_csr(mip, 0xffffffff);
+    //set_csr(mideleg, 0xffffffff);
     
+    dummyLoop();
+    
+    uint32_t mstatus  = read_csr(mstatus);
+    dummyLoop();
+
+	printf( "mstatus = 0x%x mpp = 0x%x mie = 0x%x mpie = 0x%x\n", 
+            mstatus,  (mstatus >> 11) & 0x3, (mstatus >> 3) & 0x1, (mstatus >> 7) & 0x1);
+    //set_csr(mstatus, 0x1888);
+    mstatus  = read_csr(mstatus);
+	printf( "mstatus = 0x%x mpp = 0x%x mie = 0x%x mpie = 0x%x\n", mstatus,  (mstatus >> 11) & 0x3, (mstatus >> 3) & 0x1, (mstatus >> 7) & 0x1  );
+    
+    dummyLoop();
+    //printf("EXIT");
+    //return 1;
+
     UART_init(gp_my_uart,
                   STDIO_BAUD_RATE,
                   UART_DATA_8_BITS | UART_NO_PARITY | UART_ONE_STOP_BIT);
                       
         g_stdio_uart_init_done = 1;
-    
-      
-    dummyLoop();
-    printf("PLIC setup for UART RX interrupt setup from hyper-terminal done\n\n");
+
+    printf("main.c UART_enable_irq called\n");
+    //UART_enable_irq(gp_my_uart, UART_RBF_IRQ| UART_TBE_IRQ);
+
+    //dummyLoop();
+    printf("PLIC setup for UART RX interrupt setup from hyper-terminal done\n");
+    // enabled irq
     UART_set_rx_handler(gp_my_uart,
                             uart1_rx_handler, // callback - no callback happening
-                            UART_FIFO_SINGLE_BYTE);
-    dummyLoop();
+                            UART_FIFO_FOUR_BYTES);
+    //dummyLoop();
 
     printf("UART INIT DONE\n");
     printf("HELLO CVA6\n");
 
-    LED_INIT_TEST();
+    if(use_verilator == 0)
+    {
+        LED_INIT_TEST();
+    }
+    //LED_INIT_TEST();
+    
 
     uint8_t rx_buff[32];
     uint32_t rx_idx  = 0;
     uint32_t rx_size  = 0;
 
-    UART_set_rx_handler(gp_my_uart,
-                            uart1_rx_handler,
-                            UART_FIFO_SINGLE_BYTE);
     
-
-    printf("Enter below key for demo:\n");
+    printf("==========================\n");
+    printf("\nEnter below key for demo:\n");
     printf("a -> LED blinky with 2 task and communication between task usig Queue\n");
     printf("b -> 3 task with interrupt on UART RX from hyper-terminal. HAS ISSUES UNDER DEBUG!. \n");
     printf("c -> Polling on UART RX from hyper-terminal.\n");
@@ -282,6 +328,8 @@ int main( void )
     printf("e -> Semaphore testcase\n");
     printf("f -> Attack demo without Disruptor\n");
     printf("g -> Attack demo with Disruptor\n");
+    printf("z -> Baremetal test\n");
+    printf("==========================\n");
 
     if(use_verilator == 0)
     {
@@ -297,7 +345,8 @@ int main( void )
     }
     else
     {
-        rx_buff[0] = 102;//f
+        //rx_buff[0] = 102; //f - attack code without DP
+        rx_buff[0] = 122; //z - main_baremetal
     }
     printf("switching to selected testcase\n");
 
@@ -322,8 +371,12 @@ int main( void )
     else if(rx_buff[0] == 103){ //g
         attack_without_disruptor();
     }
+    else if(rx_buff[0] == 122){ //z
+        main_baremetal();
+    }
 
-    printf("ERROR - should not reach here");
+
+    printf("EXIT  - FreeRTOS should not reach here");
     /* Exit FreeRTOS */
     return 0;
 }
