@@ -61,9 +61,9 @@ include ./Makefile.inc
 #RISCV ?= /opt/riscv
 
 #64-bit
-RISCV ?= ~/riscv_fpga  
+#RISCV ?= ~/riscv_fpga  
 #32-bit
-#RISCV ?= ~/riscv
+RISCV ?= ~/riscv
 
 FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/croutine.c \
@@ -101,6 +101,8 @@ DEMO_SRC = \
 	main.c \
 	main_blinky.c \
 	main_baremetal.c \
+	main_math_demo.c \
+	main_waveform_demo.c \
 	main_interrupt_demo.c \
 	main_polling_demo.c \
 	semaphore_demo.c \
@@ -128,14 +130,14 @@ INCLUDES = \
 	-I$(FREERTOS_SOURCE_DIR)/include \
 	-I../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISCV \
-	-I/home/thales/riscv/riscv64-unknown-elf/include/riscv-pk  \
+	-I/home/thales/riscv/riscv32-unknown-elf/include/riscv-pk  \
 	-I./uart \
 	-I./Source/include 
 
 CFLAGS = \
 	$(WARNINGS) $(INCLUDES) \
 	-fomit-frame-pointer -fno-strict-aliasing -fno-builtin \
-	-D__gracefulExit -mcmodel=medany -march=rv64ima -DUART_PRINTF\
+	-D__gracefulExit -mcmodel=medany -march=rv32gc -DUART_PRINTF\
 	-DINCLUDE_xTimerPendFunctionCall=1
 
 #	-D__gracefulExit -mcmodel=medany -march=rv64ima -DUART_PRINTF

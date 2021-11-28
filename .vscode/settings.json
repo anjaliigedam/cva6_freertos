@@ -5,6 +5,7 @@
         "syscalls.h": "c",
         "clib.h": "c",
         "plic.h": "c",
-        "encoding.h": "c"
+        "encoding.h": "c",
+        "uart.h": "c"
     }
 }

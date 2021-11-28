@@ -1,6 +1,6 @@
 # File to be included in all makefiles
 
-RISCV_XLEN ?= 64
+RISCV_XLEN ?= 32
 RISCV_LIB  ?= elf
 
 TARGET=riscv${RISCV_XLEN}-unknown-${RISCV_LIB}

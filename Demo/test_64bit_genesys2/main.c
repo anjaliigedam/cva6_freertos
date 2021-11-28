@@ -184,6 +184,13 @@ void led_off(){
 void main_baremetal( void );
 
 //----------------------------------------
+// main_math_demo.c
+void main_floating_mult_demo( void );
+void main_floating_div_demo( void );
+
+// main_waveform_demo.c
+void main_LED_demo( void );
+//----------------------------------------
 
 void main_blinky( void );
 void main_full( void );
@@ -299,11 +306,11 @@ int main( void )
     //dummyLoop();
     printf("PLIC setup for UART RX interrupt setup from hyper-terminal done\n");
     // enabled irq
-    UART_set_rx_handler(gp_my_uart,
-                            uart1_rx_handler, // callback - no callback happening
-                            UART_FIFO_FOUR_BYTES);
+    //UART_set_rx_handler(gp_my_uart,
+    //                        uart1_rx_handler, // callback - no callback happening
+    //                        UART_FIFO_SINGLE_BYTES);
     //dummyLoop();
-
+    
     printf("UART INIT DONE\n");
     printf("HELLO CVA6\n");
 
@@ -330,6 +337,18 @@ int main( void )
     printf("g -> Attack demo with Disruptor\n");
     printf("z -> Baremetal test\n");
     printf("==========================\n");
+
+    printf("\n\n==========================\n");
+    printf("\nEnter below key for demo:\n");
+    printf("1 -> Math Floating Point - Mult Demo\n");
+    printf("2 -> Math Floating Point - Div Demo\n");
+    printf("3 -> LED Demo\n");
+    printf("4 -> Oscilliscope Waveform Demo - With interrupt\n");
+    printf("5 -> PLIC Demo - UART interrupt + GPIO Interrupt \n");
+    
+    printf("==========================\n");
+
+
 
     if(use_verilator == 0)
     {
@@ -374,7 +393,25 @@ int main( void )
     else if(rx_buff[0] == 122){ //z
         main_baremetal();
     }
-
+    //==========================
+    //------------- NEW ----------
+    //==========================
+    
+    else if(rx_buff[0] == 49){ //1
+        main_floating_mult_demo();
+    }
+    else if(rx_buff[0] == 50){ //2
+        main_floating_div_demo();
+    }
+    else if(rx_buff[0] == 51){ //3
+        main_LED_demo();
+    }
+    else if(rx_buff[0] == 52){ //4
+        // Oscilliscope waveform 
+    }
+    else if(rx_buff[0] == 53){ //5
+        // PLIC with GPIO and UART interrupt
+    }
 
     printf("EXIT  - FreeRTOS should not reach here");
     /* Exit FreeRTOS */
