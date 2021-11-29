@@ -60,10 +60,22 @@ void LED_PATTERN_blink(int delay){
 	for(int i = 0; i< 5; i++){
         LEDS = 0x00;
         delay_call(delay);
-        LEDS = 0xff;        
+        LEDS = 0xff;
+		delay_call(delay);        
     }
     
 }
+
+
+void waveform_generation(int delay_on, int delay_off){
+    
+    LEDS = 0x00; //TO-DO change LED to GPIO
+    delay_call(delay_off);
+    LEDS = 0xff;
+	delay_call(delay_on);        
+
+}
+
 
 void main_LED_demo( void )
 {
@@ -83,6 +95,7 @@ void main_LED_demo( void )
 		if(rx_size > 0)
 		{
 			temp = rx_buff[0];
+			printf("\n==== Entered %c ====\r\n", temp);
 		} 
 
 		if(temp == 49){ //1

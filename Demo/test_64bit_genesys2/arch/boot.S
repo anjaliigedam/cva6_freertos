@@ -92,7 +92,7 @@ boot:
 	.globl _mstart
 /* Startup code */
 _mstart:
-    li t6, 0x1888   // MPP = machine mode/3 + MPIE + MIE   
+    li t6, 0x1808   // MPP = machine mode/3 + MPIE + MIE   
     csrw mstatus, t6
     
     la t0, trap_entry

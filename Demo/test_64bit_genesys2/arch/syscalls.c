@@ -75,6 +75,10 @@
 #include "syscalls.h"
 #include "encoding.h"
 #include "clib.h"
+// TODO - HACK _ FIXME _CLEANUP
+
+void user_irq_handler();
+
 
 volatile uint64_t tohost __attribute__((aligned(64)));
 volatile uint64_t fromhost __attribute__((aligned(64)));
@@ -156,21 +160,32 @@ void vSyscallInit(void)
 /* Trap handeler */
 unsigned long ulSyscallTrap(long cause, long epc, long regs[32])
 {
-        printf("\n\ntrap called\n\n");
-        for(int i = 0; i < 100000000; i++)
-        {
-        }
-	long returnValue = 0;
+    printf("\nsyscall.c ulSyscallTrap()\n");
+    printf("\nsyscall.c ulSyscallTrap()\n cause = %d", cause);
+    set_csr(mie, 0);
 
-	if (cause != CAUSE_MACHINE_ECALL) {
-		prvSyscallExit(cause);
+	long returnValue = 0;
+    // HACK
+    if(cause == 6 || cause == 4){
+      user_irq_handler();
+
+    }
+	else if (cause != CAUSE_MACHINE_ECALL) {
+	    printf("not CAUSE_MACHINE_ECALL\n");
+    	prvSyscallExit(cause);
 	} else if (regs[17] == SYS_exit) {
-		prvSyscallExit(regs[10]);
+		printf("SYS_exit\n");
+        prvSyscallExit(regs[10]);
 	} else {
+        printf("prvSyscallToHost()\n");
 		returnValue = prvSyscallToHost(regs[17], regs[10], regs[11], regs[12]);
 	}
 
 	regs[10] = returnValue;
-	return epc + 4;
+    
+	set_csr(mie, MIP_MEIP);
+    printf("\nsyscall.c ulSyscallTrap() Exit\n");
+    
+    return epc + 4;
 }
 /*-----------------------------------------------------------*/

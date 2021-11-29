@@ -348,7 +348,8 @@ static inline void PLIC_ClearPendingIRQ(void)
     volatile uint32_t int_num  = PLIC_ClaimIRQ();
     
     volatile int32_t wait_possible_int;
-    printf("1 int_num = %d\n", int_num);
+    printf("interrupt_number = %d\n", int_num);
+
     while ( int_num != NoInterrupt_IRQHandler)
     {
         uint8_t disable = EXT_IRQ_KEEP_ENABLED;

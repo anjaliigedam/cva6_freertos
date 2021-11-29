@@ -103,7 +103,7 @@
 #include "arch/clib.h"
 #include "uart/uart.h"
 #include "encoding.h"
-
+#include "plic.h"
 
 // clib.c - putchar is updated to route printf to uart
 static uart_instance_t * const gp_my_uart = &g_uart_0;
@@ -222,6 +222,34 @@ void uart1_rx_handler(uart_instance_t * this_uart)
     
 }
 
+void user_irq_handler()
+{
+    printf("user_irq_handler called\r\n");
+    uint32_t  interrupt_id;
+
+	
+	interrupt_id = PLIC_ClaimIRQ();
+    printf("interrupt_id from PLIC = %d\r\n", interrupt_id);
+    
+    // call ISR for particular interrupt_id
+    // TODO 
+
+
+    PLIC_CompleteIRQ(interrupt_id);
+    PLIC_CompleteIRQ(1);
+    
+    // PLIC_ClearPendingIRQ();
+
+    dummyLoop();
+    dummyLoop();
+    dummyLoop();
+    dummyLoop();
+    
+    printf("uart1_rx_handler interrupt EXIT\n");
+    
+}
+
+
 
 int dummyLoop(){
     int i;
@@ -271,6 +299,14 @@ void LED_INIT_TEST(){
 }
 
 
+void enable_interrupt_main()
+{
+
+    UART_set_rx_handler(&g_uart_0,
+                            uart1_rx_handler,
+                            UART_FIFO_FOUR_BYTES);
+}
+
 
 int main( void )
 {
@@ -298,19 +334,8 @@ int main( void )
                   STDIO_BAUD_RATE,
                   UART_DATA_8_BITS | UART_NO_PARITY | UART_ONE_STOP_BIT);
                       
-        g_stdio_uart_init_done = 1;
+    g_stdio_uart_init_done = 1;
 
-    printf("main.c UART_enable_irq called\n");
-    //UART_enable_irq(gp_my_uart, UART_RBF_IRQ| UART_TBE_IRQ);
-
-    //dummyLoop();
-    printf("PLIC setup for UART RX interrupt setup from hyper-terminal done\n");
-    // enabled irq
-    //UART_set_rx_handler(gp_my_uart,
-    //                        uart1_rx_handler, // callback - no callback happening
-    //                        UART_FIFO_SINGLE_BYTES);
-    //dummyLoop();
-    
     printf("UART INIT DONE\n");
     printf("HELLO CVA6\n");
 
@@ -340,11 +365,9 @@ int main( void )
 
     printf("\n\n==========================\n");
     printf("\nEnter below key for demo:\n");
-    printf("1 -> Math Floating Point - Mult Demo\n");
-    printf("2 -> Math Floating Point - Div Demo\n");
-    printf("3 -> LED Demo\n");
-    printf("4 -> Oscilliscope Waveform Demo - With interrupt\n");
-    printf("5 -> PLIC Demo - UART interrupt + GPIO Interrupt \n");
+    printf("1 -> LED Demo \n");
+    printf("2 -> Oscilliscope Waveform Demo \n");
+    printf("3 -> PLIC Demo - UART interrupt + GPIO Interrupt \n");
     
     printf("==========================\n");
 
@@ -367,12 +390,18 @@ int main( void )
         //rx_buff[0] = 102; //f - attack code without DP
         rx_buff[0] = 122; //z - main_baremetal
     }
+
+
+    dummyLoop();
+    
     printf("switching to selected testcase\n");
 
     if(rx_buff[0] == 97){   // a
+        enable_interrupt_main();
         main_blinky();
     }
-    else if(rx_buff[0] == 98){  // b  
+    else if(rx_buff[0] == 98){  // b
+        enable_interrupt_main();  
         main_interrupt_demo();
     }
     else if(rx_buff[0] == 99){  // c 
@@ -391,25 +420,21 @@ int main( void )
         attack_without_disruptor();
     }
     else if(rx_buff[0] == 122){ //z
+        enable_interrupt_main();
         main_baremetal();
     }
     //==========================
     //------------- NEW ----------
     //==========================
     
+
     else if(rx_buff[0] == 49){ //1
-        main_floating_mult_demo();
-    }
-    else if(rx_buff[0] == 50){ //2
-        main_floating_div_demo();
-    }
-    else if(rx_buff[0] == 51){ //3
         main_LED_demo();
     }
-    else if(rx_buff[0] == 52){ //4
+    else if(rx_buff[0] == 50){ //2
         // Oscilliscope waveform 
     }
-    else if(rx_buff[0] == 53){ //5
+    else if(rx_buff[0] == 51){ //3
         // PLIC with GPIO and UART interrupt
     }
 
