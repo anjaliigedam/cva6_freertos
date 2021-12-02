@@ -190,6 +190,7 @@ void main_floating_div_demo( void );
 
 // main_waveform_demo.c
 void main_LED_demo( void );
+void main_waveform_demo( void);
 //----------------------------------------
 
 void main_blinky( void );
@@ -208,6 +209,25 @@ void test_2( void );
 void test_3( void );
 void test_4( void );
 
+int dummyLoop2(int i){
+    
+    int loop_count = 100000*i;
+    
+    if(use_verilator == 1)
+    {
+        loop_count = 10;
+    }
+
+    //for
+    for(i = 0; i < loop_count; i++)
+    {
+        i++;
+    }
+
+    return i;
+}
+
+
 void uart1_rx_handler(uart_instance_t * this_uart)
 {
     uint32_t rx_size; 
@@ -224,28 +244,32 @@ void uart1_rx_handler(uart_instance_t * this_uart)
 
 void user_irq_handler()
 {
-    printf("user_irq_handler called\r\n");
-    uint32_t  interrupt_id;
-
+    printf("\n==== user_irq_handler called ====\r\n");
+ 	int interrupt_id = 0;
+	uint32_t *interrupt_claim_address = NULL;
+    int int_pending = PLIC->PENDING_ARRAY[0];
+	printf( "plic interrupt pending = %d\n", int_pending);
+ 		
+   	uint32_t mcause  = read_csr(mcause);
+	printf( "mcause = 0x%x\n", mcause);
+ 	
+    interrupt_id = PLIC_ClaimIRQ();
+	printf("interrupt_id from PLIC = %d\r\n", interrupt_id);
+    
+    int_pending = PLIC->PENDING_ARRAY[0];
+	printf( "interrupt pending post claim= %d\n", int_pending);
+ 	
+    uint8_t rx_buff[32];
+    uint32_t rx_size = 0;
+	rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+    printf("typed = %c\r\n", rx_buff[0]);
 	
-	interrupt_id = PLIC_ClaimIRQ();
-    printf("interrupt_id from PLIC = %d\r\n", interrupt_id);
-    
-    // call ISR for particular interrupt_id
-    // TODO 
-
-
     PLIC_CompleteIRQ(interrupt_id);
-    PLIC_CompleteIRQ(1);
+	
+    		
+	dummyLoop2(500);
     
-    // PLIC_ClearPendingIRQ();
-
-    dummyLoop();
-    dummyLoop();
-    dummyLoop();
-    dummyLoop();
-    
-    printf("uart1_rx_handler interrupt EXIT\n");
+    printf("==== user_irq_handler interrupt EXIT ====\n");
     
 }
 
@@ -432,7 +456,7 @@ int main( void )
         main_LED_demo();
     }
     else if(rx_buff[0] == 50){ //2
-        // Oscilliscope waveform 
+        main_waveform_demo();
     }
     else if(rx_buff[0] == 51){ //3
         // PLIC with GPIO and UART interrupt

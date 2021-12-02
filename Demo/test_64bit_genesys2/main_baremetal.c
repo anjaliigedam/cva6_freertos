@@ -19,8 +19,10 @@ void main_baremetal( void )
 	uint32_t int_pending = PLIC->PENDING_ARRAY[0];
 	uint8_t rx_buff[32];
     uint32_t rx_size = 0;
-	
-	
+	int interrupt_id = 0;
+	uint32_t *interrupt_claim_address = NULL;
+
+
 	printf( "\n plic_en = %d plic_en1 = %d\n", plic_en, plic_en1);
 	while(1){
 		plic_en  = PLIC->HART0_MMODE_ENA[0];
@@ -61,9 +63,21 @@ void main_baremetal( void )
 		//printf( "\n UART_get_modem_status = %d\n", UART_get_modem_status());
 
 		//uart_isr_rx_polling_handler();
+		/*
+		interrupt_id = PLIC_ClaimIRQ();
+		printf("interrupt_id from PLIC = %d\r\n", interrupt_id);
 
+    	// call ISR for particular interrupt_id
+    	// TODO 
+		if(interrupt_id != 0)
+		{
+			rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
 
-		for(int i = 0; i < 1000000; i++){
+			PLIC_CompleteIRQ(interrupt_id);
+		}
+    	*/
+
+		for(int i = 0; i < 10000000; i++){
 		
 
 		}

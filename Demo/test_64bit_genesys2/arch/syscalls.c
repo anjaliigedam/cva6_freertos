@@ -157,18 +157,34 @@ void vSyscallInit(void)
 }
 /*-----------------------------------------------------------*/
 
+// wont work for 32bit? 
+// long is 8byte?
 /* Trap handeler */
-unsigned long ulSyscallTrap(long cause, long epc, long regs[32])
+//uintptr_t handle_trap(uintptr_t mcause, uintptr_t epc)
+
+uintptr_t ulSyscallTrap(uintptr_t cause, uintptr_t epc, long regs[32])
 {
-    printf("\nsyscall.c ulSyscallTrap()\n");
-    printf("\nsyscall.c ulSyscallTrap()\n cause = %d", cause);
+    printf("\nsyscall.c ulSyscallTrap() cause = %d\r\n", cause);
     set_csr(mie, 0);
+    
+    uint32_t mcause  = read_csr(mcause);
+	printf( "mcause = 0x%x\n", mcause);
+ 	
+    uint32_t scause  = read_csr(scause);
+	printf( "scause = 0x%x\n", scause);
+ 	
 
 	long returnValue = 0;
-    // HACK
-    if(cause == 6 || cause == 4){
-      user_irq_handler();
+    // HACK - need to go to external interrupt handler 
 
+    if(cause == 0x8000000b){
+      // 8 is interrupt : b = 11 = external interrupt 
+      user_irq_handler();
+        
+    }
+    if(cause == 0x80000007){
+
+        interrupt();
     }
 	else if (cause != CAUSE_MACHINE_ECALL) {
 	    printf("not CAUSE_MACHINE_ECALL\n");
@@ -182,8 +198,8 @@ unsigned long ulSyscallTrap(long cause, long epc, long regs[32])
 	}
 
 	regs[10] = returnValue;
-    
-	set_csr(mie, MIP_MEIP);
+
+	//set_csr(mie, MIP_MEIP);
     printf("\nsyscall.c ulSyscallTrap() Exit\n");
     
     return epc + 4;

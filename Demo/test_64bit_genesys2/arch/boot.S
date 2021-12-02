@@ -82,6 +82,10 @@
 # define REGBYTES 4
 #endif
 
+.align 2
+.global interrupt
+.global softwareInterrupt
+
 boot:
     // li t6, 0x1800   // machine mode
     li t6, 0x1880   // MPP = machine mode/3 + MPIE + MIE   
@@ -91,8 +95,12 @@ boot:
 	.section .text,"ax",@progbits
 	.globl _mstart
 /* Startup code */
+// mstatus
+//   (14 13):FSS (12 --- 11):MPP 10 9 8 --- 7:MPIE 6 5 4 --- 3:MIE 2 1 0
 _mstart:
-    li t6, 0x1808   // MPP = machine mode/3 + MPIE + MIE   
+    li t6, 0x1808   // MPP=3(machine-mode) + MIE   
+    //li t6, 0x1800   // MPP=3(machine-mode)    
+    
     csrw mstatus, t6
     
     la t0, trap_entry
@@ -181,16 +189,21 @@ softwareInterrupt:
 /* For when a trap is fired */
 trap_entry:
 	/* Check for interrupt */
-	addi	sp, sp, -REGBYTES
+	// Add below for FREERTOS
+    // look at shakti code and add handler for exception and interrupt LUT
+    // TODO 
+    //------------------------------------
+    addi	sp, sp, -REGBYTES
 	STORE	t0, 0x0(sp)
 	csrr	t0, mcause
 	blt	t0,x0,interrupt
 	LOAD	t0, 0x0(sp)
 	addi	sp, sp, REGBYTES
-
+    //------------------------------------
+    
 	/* System call and other traps */
 	addi sp, sp, -REGBYTES*31
-	STORE x1, 1*REGBYTES(sp)
+    STORE x1, 1*REGBYTES(sp)
 	STORE x2, 2*REGBYTES(sp)
 	STORE x3, 3*REGBYTES(sp)
 	STORE x4, 4*REGBYTES(sp)
@@ -224,11 +237,8 @@ trap_entry:
 
 	csrr a0, mcause
 	csrr a1, mepc
-
-
 	mv a2, sp
 	jal ulSyscallTrap
-
 	csrw mepc, a0
 
 	LOAD x1, 1*REGBYTES(sp)

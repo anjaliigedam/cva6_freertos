@@ -79,6 +79,8 @@
 long syscall(long num, long arg0, long arg1, long arg2);
 
 void vSyscallInit(void);
-unsigned long ulSyscallTrap(long cause, long epc, long regs[32]);
+// unsigned long ulSyscallTrap(long cause, long epc, long regs[32]);
+uintptr_t ulSyscallTrap(uintptr_t cause, uintptr_t epc, long regs[32]);
+
 
 #endif /* SYSCALLS_H */

@@ -114,9 +114,9 @@ typedef struct
     volatile uint32_t SOURCE_PRIORITY[PLIC_NUM_SOURCES]; //c000000+4 because this is array 30
     //volatile uint32_t SOURCE_PRIORITY[0]; //c000004
     //volatile uint32_t SOURCE_PRIORITY[1]; //c000008
-    
     volatile uint32_t RESERVED1[(0x1000/4) - (PLIC_NUM_SOURCES + 1)]; 
 
+    //c001000
     /*-------------------- Pending array --------------------*/
     volatile const uint32_t PENDING_ARRAY[PLIC_SET_UP_REGISTERS];
     volatile uint32_t RESERVED2[(0x1000/4) - PLIC_SET_UP_REGISTERS];
@@ -124,16 +124,17 @@ typedef struct
     /*-------------------- Target enables --------------------*/
     //volatile Target_Enables_Type TARGET_ENABLES[PLIC_SET_UP_REGISTERS];
     //volatile uint32_t RESERVED3[(0x200000-0x2000) - PLIC_SET_UP_REGISTERS];
-    
+    //c002000
     /*-----------------Target Mode Enables--------------------*/
     volatile uint32_t HART0_MMODE_ENA[PLIC_SET_UP_REGISTERS];
     volatile uint32_t RESERVED3a[(0x80/4) - PLIC_SET_UP_REGISTERS];
-
+    // c002080
     volatile uint32_t HART0_SMODE_ENA[PLIC_SET_UP_REGISTERS];
     volatile uint32_t RESERVED3b[(0x80/4) - PLIC_SET_UP_REGISTERS];
 
     volatile uint32_t RESERVED4[(0x200000-0x2000)/4 - PLIC_SET_UP_REGISTERS];
-
+    
+    //c200000
     /*--- Target Priority threshold and claim/complete---------*/
     IRQ_Target_Type TARGET[NUM_CLAIM_REGS];
 
@@ -151,7 +152,7 @@ typedef struct
  * PLIC: Platform Level Interrupt Controller
  */
 #define PLIC_BASE_ADDR 0x0C000000UL
-
+#define PLIC_CLAIM_OFFSET 0x200004
 #define PLIC    ((PLIC_Type *)PLIC_BASE_ADDR)
 
 /*-------------------------------------------------------------------------*//**
@@ -297,19 +298,33 @@ static inline uint32_t PLIC_ClaimIRQ(void)
     printf("\n");printf(__func__);printf("\n");
     unsigned long hart_id = read_csr(mhartid);
 
-    return PLIC->TARGET[hart_id].CLAIM_COMPLETE;
+	uint32_t *interrupt_claim_address = NULL;
+    // HAS BUG in struct
+    // return PLIC->TARGET[hart_id].CLAIM_COMPLETE;
+    interrupt_claim_address = (uint32_t *)(PLIC_BASE_ADDR + PLIC_CLAIM_OFFSET);
+    int interrupt_id = *interrupt_claim_address; 
+    return interrupt_id;
+
 }
 
 /***************************************************************************//**
  * The function PLIC_CompleteIRQ() indicates to the PLIC controller the
  * interrupt is processed and claim is complete.
  */
-static inline void PLIC_CompleteIRQ(uint32_t source)
+static inline void PLIC_CompleteIRQ(uint32_t interrupt_id)
 {
     printf(__func__);printf("\n");
     unsigned long hart_id = read_csr(mhartid);
 
-    PLIC->TARGET[hart_id].CLAIM_COMPLETE = source;
+    // HAS bug with struct
+    //PLIC->TARGET[hart_id].CLAIM_COMPLETE = interrupt_id;
+
+	uint32_t *claim_addr =  (uint32_t *) (PLIC_BASE_ADDR +
+						      PLIC_CLAIM_OFFSET);
+
+	*claim_addr = interrupt_id;
+
+
 }
 
 /***************************************************************************//**

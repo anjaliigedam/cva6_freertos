@@ -120,4 +120,31 @@ void main_LED_demo( void )
 	printf( "\n==== Exiting %s ====\n", __func__);	
 }
 
+void main_waveform_demo( void)
+{
+	printf("\n\n====main_Waveform_Demo()==== \n\n");
+	printf( "1 -> LED_PATTERN_1\n");
+	printf( "2 -> LED_PATTERN_2\n");
+		
 
+    uint32_t rx_size; 
+    uint8_t rx_buff[32];
+	uint8_t temp = "1";
+
+	while(1){
+		rx_size = UART_get_rx(gp_my_uart, rx_buff, sizeof(rx_buff));
+		if(rx_size > 0)
+		{
+			temp = rx_buff[0];
+			printf("\n==== Entered %c ====\r\n", temp);
+		} 
+
+		if(temp == 49){ //1
+			waveform_generation(10,10);
+		}
+		else if(temp == 50){ //2
+			waveform_generation(100,10);
+		}
+	}
+	printf( "\n==== Exiting %s ====\n", __func__);	
+}
