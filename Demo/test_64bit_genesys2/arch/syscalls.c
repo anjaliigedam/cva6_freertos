@@ -78,6 +78,7 @@
 // TODO - HACK _ FIXME _CLEANUP
 
 void user_irq_handler();
+void trap_entry2();
 
 
 volatile uint64_t tohost __attribute__((aligned(64)));
@@ -183,9 +184,13 @@ uintptr_t ulSyscallTrap(uintptr_t cause, uintptr_t epc, long regs[32])
         
     }
     else if(cause == 0x80000007){
+    
+        printf("\nsyscall.c interrupt() called");
 
-        interrupt();
+        //trap_entry2();
     }
+
+
 	else if (cause != CAUSE_MACHINE_ECALL) {
 	    printf("not CAUSE_MACHINE_ECALL\n");
     	//prvSyscallExit(cause);

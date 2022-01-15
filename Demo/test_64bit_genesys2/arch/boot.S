@@ -85,6 +85,8 @@
 .align 2
 .global interrupt
 .global softwareInterrupt
+.global trap_entry2
+
 
 boot:
     //li t6, 0x1800   // machine mode
@@ -200,17 +202,28 @@ trap_entry:
     // look at shakti code and add handler for exception and interrupt LUT
     // TODO 
     //------------------------------------
-    /*
+    
+    
+
     addi	sp, sp, -REGBYTES
 	STORE	t0, 0x0(sp)
 	csrr	t0, mcause
-	blt	t0,x0,interrupt
+    //if(cause == 0x8000000b){
+        //jump to trap_entry2    
+    //}
+    li t3, 0x8000000b
+    beq t0, t3, trap_entry2
+    
+    blt	t0,x0,interrupt
+    LOAD	t0, 0x0(sp)
+	addi	sp, sp, REGBYTES
+    
+    //------------------------------------
+trap_entry2:
 	LOAD	t0, 0x0(sp)
 	addi	sp, sp, REGBYTES
-    */
-    //------------------------------------
     
-	/* System call and other traps */
+    /* System call and other traps */
 	addi sp, sp, -REGBYTES*31
     STORE x1, 1*REGBYTES(sp)
 	STORE x2, 2*REGBYTES(sp)
