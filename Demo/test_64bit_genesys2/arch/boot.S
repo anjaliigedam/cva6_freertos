@@ -87,8 +87,11 @@
 .global softwareInterrupt
 
 boot:
-    // li t6, 0x1800   // machine mode
-    li t6, 0x1880   // MPP = machine mode/3 + MPIE + MIE   
+    //li t6, 0x1800   // machine mode
+    //li t6, 0x1880   // MPP = machine mode/3 + MPIE + MIE   
+    li t6, (3<<13) | (3 << 11) | (1 << 7)|  (1<<3)  // MPP=3(machine-mode) + MIE   
+    
+    //li t6, 0x0080   // MPP = machine mode/3 + MPIE + MIE   
     csrw mstatus, t6
     j _mstart
 
@@ -96,10 +99,14 @@ boot:
 	.globl _mstart
 /* Startup code */
 // mstatus
-//   (14 13):FSS (12 --- 11):MPP 10 9 8 --- 7:MPIE 6 5 4 --- 3:MIE 2 1 0
+//   FS       MPP     MPIE  MIE
+//   (14 13) (12 11)    7    3
 _mstart:
+    //li t6, (3<<13) | (3 << 11) | (1 << 7)|  (1<<3)  // MPP=3(machine-mode) + MIE   
+    
     li t6, 0x1808   // MPP=3(machine-mode) + MIE   
     //li t6, 0x1800   // MPP=3(machine-mode)    
+    //li t6, 0x0008   // MPP=3(machine-mode) + MIE   (FS = 0 for int)
     
     csrw mstatus, t6
     
@@ -193,12 +200,14 @@ trap_entry:
     // look at shakti code and add handler for exception and interrupt LUT
     // TODO 
     //------------------------------------
+    /*
     addi	sp, sp, -REGBYTES
 	STORE	t0, 0x0(sp)
 	csrr	t0, mcause
 	blt	t0,x0,interrupt
 	LOAD	t0, 0x0(sp)
 	addi	sp, sp, REGBYTES
+    */
     //------------------------------------
     
 	/* System call and other traps */

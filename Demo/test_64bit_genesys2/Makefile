@@ -137,9 +137,10 @@ INCLUDES = \
 CFLAGS = \
 	$(WARNINGS) $(INCLUDES) \
 	-fomit-frame-pointer -fno-strict-aliasing -fno-builtin \
-	-D__gracefulExit -mcmodel=medany -march=rv32imaf -DUART_PRINTF\
+	-D__gracefulExit -mcmodel=medany -march=rv32ima -DUART_PRINTF\
 	-DINCLUDE_xTimerPendFunctionCall=1
 
+	#-D__gracefulExit -mcmodel=medany -march=rv32imaf -DUART_PRINTF\
 #	-D__gracefulExit -mcmodel=medany -march=rv64ima -DUART_PRINTF
 #Commented for verilator from above
 

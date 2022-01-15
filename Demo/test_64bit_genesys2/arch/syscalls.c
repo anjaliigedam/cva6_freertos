@@ -182,13 +182,13 @@ uintptr_t ulSyscallTrap(uintptr_t cause, uintptr_t epc, long regs[32])
       user_irq_handler();
         
     }
-    if(cause == 0x80000007){
+    else if(cause == 0x80000007){
 
         interrupt();
     }
 	else if (cause != CAUSE_MACHINE_ECALL) {
 	    printf("not CAUSE_MACHINE_ECALL\n");
-    	prvSyscallExit(cause);
+    	//prvSyscallExit(cause);
 	} else if (regs[17] == SYS_exit) {
 		printf("SYS_exit\n");
         prvSyscallExit(regs[10]);

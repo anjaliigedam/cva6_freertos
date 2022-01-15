@@ -7,6 +7,7 @@
  */
 // Additional contributions by:
 //         Sebastien Jacq - sjthales on github.com
+//         Anjali Gedam - anjaliigedam on github.com
 //
 // Description: Driver for UART Ip of the CVA6 platform
 //
@@ -14,6 +15,7 @@
 // Revisions  :
 // Date        Version  Author       Description
 // 2020-10-06  0.1      S.Jacq       modification of the Test for CVA6 softcore
+// 2021-07-12  0.2      Anjali G     modification for the CVA6 FPGA
 // =========================================================================== //
 
 
